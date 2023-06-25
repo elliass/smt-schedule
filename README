@@ -1,0 +1,2 @@
+install z3 : pip install z3-solver
+run main.py 
