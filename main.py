@@ -3,8 +3,8 @@ from solver import TSCHSolver
 
 # Display assignment ouptut as a tuple for each edge
 def print_edges(ts_list, ch_list, edges):
-    for i, edge in enumerate(edges):
-        print(f"{edge}: ({ts_list[i]},{ch_list[i]})")
+    for ts, ch, edge in zip(ts_list, ch_list, edges):
+        print(f"{edge}: ({ts},{ch})")
 
 # Define main function running TSCH algorithm to find feasible schedules
 def main(tsch):

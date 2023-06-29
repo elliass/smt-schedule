@@ -1,13 +1,10 @@
 class Topology:
-    def __init__(self, MAX_EDGES, MAX_SLOTS, MAX_CHANNELS) -> None:
-        self.MAX_EDGES = MAX_EDGES
-        self.MAX_SLOTS = MAX_SLOTS
-        self.MAX_CHANNELS = MAX_CHANNELS
+    def __init__(self, max_edges, max_slots, max_channels):
+        self.MAX_EDGES = max_edges
+        self.MAX_SLOTS = max_slots
+        self.MAX_CHANNELS = max_channels
 
     def get_edges(self):
         # Define the list of communication represented with edges
-        edges = []
-        for edge in range(self.MAX_EDGES):
-            edges.append(f"e{edge}")
-        
+        edges = [f"e{edge}" for edge in range(self.MAX_EDGES)]
         return edges

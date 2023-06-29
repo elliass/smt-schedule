@@ -13,8 +13,9 @@ class TSCHSolver:
         return self.model_constraints
     
     def add_constraint(self, constraints):
-        for constraint in constraints:
-            self.model_constraints.append(constraint)
+        # for constraint in constraints:
+        #     self.model_constraints.append(constraint)
+        self.model_constraints.extend(constraints)
 
     def get_assignments(self):
         # Define variables to represent the assignment of each communication
@@ -49,22 +50,19 @@ class TSCHSolver:
     # Convert string or list of strings to int
     def to_int(self, args):
         if isinstance(args, list):
-            args_int = []
-            for arg in args:
-                args_int.append(int(arg[1]))
-            return args_int
+            return [int(arg[1]) for arg in args]
         else:
             return int(args[1])
 
     # Define dependency between two edges
     def set_dependency_constraint(self, u, v):
-        timeslots, channels = self.get_timeslots_channels()
+        timeslots, _ = self.get_timeslots_channels()
         dependency_constraint = [ timeslots[self.to_int(u)] > timeslots[self.to_int(v)] ]
         self.add_constraint(dependency_constraint)
 
     # Define conflict between two edges
     def set_conflict_constraint(self, u, v):
-        timeslots, channels = self.get_timeslots_channels()
+        timeslots, _ = self.get_timeslots_channels()
         conflict_constraint = [ timeslots[self.to_int(u)] != timeslots[self.to_int(v)] ]
         self.add_constraint(conflict_constraint)
     
@@ -87,7 +85,7 @@ class TSCHSolver:
         return self.channel_concurrency
     
     def set_concurrency_constraint(self):
-        timeslots, channels = self.get_timeslots_channels()
+        timeslots, _ = self.get_timeslots_channels()
         timeslot_concurrency = self.get_timeslot_concurrency()
         channel_concurrency = self.get_channel_concurrency()
 
@@ -96,16 +94,10 @@ class TSCHSolver:
         unique_timeslot_constraint = [ timeslots[i] != timeslots[j] for i in range(self.topology.MAX_EDGES) for j in range(i+1, self.topology.MAX_EDGES) ]    
         
         # Except for concurrent edges (Remove constraint from unique (distinct) constraint)
-        timeslot_constraint = []
-        for i in unique_timeslot_constraint:
-            if i in timeslot_concurrency:
-                continue
-            timeslot_constraint.append(i)
+        timeslot_constraint = [i for i in unique_timeslot_constraint if i not in timeslot_concurrency]
 
         # Concurrent edges are assigned different channel offsets (inequality added to constraints)
-        channel_constraint = []
-        for i in channel_concurrency:
-            channel_constraint.append(i)
+        channel_constraint = channel_concurrency
 
         # Add timeslot and channel constraints to the model
         self.add_constraint([ timeslot_constraint, channel_constraint ])
@@ -131,20 +123,20 @@ class TSCHSolver:
         constraints = self.get_constraint()
 
         # Create Z3 solver and add constraints
-        s = Solver()
+        solver = Solver()
         for constraint in constraints:
-            s.add(constraint)
+            solver.add(constraint)
 
         # Evaluate model
         solutions = []
         counter = 0
 
         # Iterate over each pair of slot_assignment and channel_assignment
-        while counter < self.max_solutions and s.check() == sat:
+        while counter < self.max_solutions and solver.check() == sat:
             solution = {}
 
             # Get the model with the assigned values
-            model = s.model()
+            model = solver.model()
             
             # Retrieve the assignments for each communication
             timeslot_values = [ model.evaluate(timeslots[i]) for i in range(len(edges)) ]
@@ -158,7 +150,7 @@ class TSCHSolver:
             # Add blocking clause to prevent finding the same solution again
             blocking_clauses = [Or(timeslots[i] != timeslot_values[i], channels[i] != channel_values[i]) for i in range(len(edges))]
             blocking_clause = Or(blocking_clauses)
-            s.add(blocking_clause)
+            solver.add(blocking_clause)
 
             counter += 1
         
