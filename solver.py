@@ -1,7 +1,7 @@
 from z3 import Solver, Int, And, Or, sat
 
 class TSCHSolver:
-    def __init__(self, topology, max_solutions) -> None:
+    def __init__(self, topology, max_solutions):
         self.topology = topology
         self.max_solutions = max_solutions
         self.model_constraints = []
@@ -9,28 +9,28 @@ class TSCHSolver:
         self.timeslot_concurrency = []
         self.channel_concurrency = []
 
-    def get_constraint(self) -> None:
+    def get_constraint(self):
         return self.model_constraints
     
-    def add_constraint(self, constraints) -> None:
+    def add_constraint(self, constraints):
         for constraint in constraints:
             self.model_constraints.append(constraint)
 
-    def get_assignments(self) -> list:
+    def get_assignments(self):
         # Define variables to represent the assignment of each communication
         edges = self.topology.get_edges()
         assignments = [(Int(f"{edge}_timeslot"), Int(f"{edge}_channel")) for edge in edges]
         
         return assignments
     
-    def get_timeslots_channels(self) -> tuple[tuple]:
+    def get_timeslots_channels(self):
         # Unpack assignments into separate lists for timeslots and channels
         assignments = self.get_assignments()
         timeslots, channels = zip(*assignments)
 
         return timeslots, channels
     
-    def set_default_constraint(self) -> None:
+    def set_default_constraint(self):
         timeslots, channels = self.get_timeslots_channels()
         
         # Each edge is assigned a timeslot value from 0 to MAX_SLOTS and a channel value from 0 to MAX_CHANNELS
@@ -57,13 +57,13 @@ class TSCHSolver:
             return int(args[1])
 
     # Define dependency between two edges
-    def set_dependency_constraint(self, u, v) -> None:
+    def set_dependency_constraint(self, u, v):
         timeslots, channels = self.get_timeslots_channels()
         dependency_constraint = [ timeslots[self.to_int(u)] > timeslots[self.to_int(v)] ]
         self.add_constraint(dependency_constraint)
 
     # Define conflict between two edges
-    def set_conflict_constraint(self, u, v) -> None:
+    def set_conflict_constraint(self, u, v):
         timeslots, channels = self.get_timeslots_channels()
         conflict_constraint = [ timeslots[self.to_int(u)] != timeslots[self.to_int(v)] ]
         self.add_constraint(conflict_constraint)
@@ -77,7 +77,7 @@ class TSCHSolver:
         self.timeslot_concurrency.append(timeslot_condition)
         self.channel_concurrency.append(channel_condition)
 
-    def get_concurrency(self) -> None:
+    def get_concurrency(self):
         return self.concurrency_constraints
     
     def get_timeslot_concurrency(self):
@@ -86,7 +86,7 @@ class TSCHSolver:
     def get_channel_concurrency(self):
         return self.channel_concurrency
     
-    def set_concurrency_constraint(self) -> None:
+    def set_concurrency_constraint(self):
         timeslots, channels = self.get_timeslots_channels()
         timeslot_concurrency = self.get_timeslot_concurrency()
         channel_concurrency = self.get_channel_concurrency()

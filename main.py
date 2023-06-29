@@ -37,7 +37,7 @@ tsch = TSCHSolver(topology, max_solutions=1)    # maximum number of solutions to
 # Set topology constraints
 tsch.set_dependency_constraint('e4', 'e2')      # e4 relies on e2 -> e4 must be scheduled in a timeslot after e2
 tsch.set_dependency_constraint('e5', 'e3')          
-tsch.set_conflict_constraint('e4', 'e1')        # e4 conflicts with e1 -> e4 must be scheduled in a different timeslot than e2
+tsch.set_conflict_constraint('e4', 'e1')        # e4 conflicts with e1 -> e4 must be scheduled in a different timeslot than e1
 tsch.set_conflict_constraint('e5', 'e1')
 tsch.set_conflict_constraint('e5', 'e4')
 tsch.set_concurrency('e3', 'e4')                # e3 independent from e4 -> e3 and e4 can be scheduled in the same timeslot
