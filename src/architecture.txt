@@ -1,0 +1,39 @@
++-------------------------------------------+
+|     main.py                               |
++-------------------------------------------+
+| Imports Topology and TSCHSolver classes   |
+| Defines main function                     |
+|     - Initializes Topology and TSCHSolver |
+|     - Sets topology constraints           |
+|     - Calls find method of TSCHSolver     |
+|     - Prints solutions                    |
++-------------------------------------------+
+                    |
+                    |
+                    v
++-------------------------------------------+
+|    Topology                               |
++-------------------------------------------+
+| + constructor: none                       |
+| + get_edges: list[string]                 |
++-------------------------------------------+
+                    |
+                    |
+                    v
++-------------------------------------------+
+|    Solver                                 |
++-------------------------------------------+
+| + constructor: none                       |
+| + get_constraint: list[string]            |
+| + add_constraint: none                    |
+| + get_assignments: list[string]           |
+| + get_timeslots_channels: tuple[tuple]    |
+| + set_default_constraint: none            |
+| + set_dependency_constraint: none         |
+| + set_conflict_constraint: none           |
+| + set_concurrency: none                   |
+| + get_timeslot_concurrency: list[string]  |
+| + get_channel_concurrency: list[string]   |
+| + set_concurrency_constraint: none        |
+| + find: dict                              |
++-------------------------------------------+                  
