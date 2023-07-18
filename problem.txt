@@ -1,0 +1,60 @@
+Network topology:
+- 4 nodes
+- 3 ranging communications involving the same target node
+- 2 forwarding communications involving the same target node
+
+Variables:
+- SCH: channel offet
+- STS: timeslot
+
+Constraints:
+- ranging communications can not be scheduled in same cell
+- forwarding communications can not be scheduled in same cell
+- 1 ranging and 1 forwarding can be scheduled in same cell 
+	if sender and receiver node performing forwarding not involved in ranging
+- max channel and timeslot available
+
+Objective:
+Minimize slotframe size
+
+----------------
+Input:
+----------------
+Define topology
+Define communications
+Define number of constraints 
+Define slotframe size based on constraints
+
+----------------
+Output:
+----------------
+Verify results
+Evaluate quality
+
+
+To do: 
+- Log results for each run to gather metrics for evaluation 
+- Give the possibility to increase the problem and analyse the sensibility
+- Add more UWB functionality
+- Allow CAP
+- Shared network control communications
+- Allow mulitple tags per cells
+- Allow cross cell communications
+- Allow parent - child forwarding communications to the root node
+
+- Add recursive parent_node forwarding communication
+- Change logic for constraints using node.get_communication
+- Add communication between root and root to simulate forwarding betwwen t1 and a1 and forwarding to localization engine
+
+- Generalize and Test solution reliability with complex topology
+- Sensitivity analysis and generate logs
+- Add a function edge.is_cap()
+
+
+Done:
+- Verify solution not working properly -> improve 
+- Handle exception (CAP, dependency, conflict exception) and create exception class
+
+
+Remove
+- Update constraint generation using OOP

@@ -79,7 +79,9 @@ class TSCHSchedule:
     def get_dependency_constraints(self):
         timeslots, _ = self.get_timeslots_channels()
         communications = self.network.get_communication()
+        # print(communications)
         edges = self.network.get_edges()
+        # print(edges)
         for edge_u, communication_u in zip(edges, communications):
             for edge_v, communication_v in zip(edges, communications):
                 _, node_u = communication_u
@@ -87,6 +89,7 @@ class TSCHSchedule:
                 if node_u == node_v:
                     constraints = [ timeslots[self.to_int(edge_u.name)] < timeslots[self.to_int(edge_v.name)] ]
                     self.dependency_constraints.extend(constraints)
+        # print(self.dependency_constraints)
         return self.dependency_constraints
     
     def get_conflict_constraints(self):

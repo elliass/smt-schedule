@@ -1,5 +1,6 @@
 from z3 import Solver, Int, Or, Sum, If, Optimize, sat
 from TSCHSchedule import TSCHSchedule
+from Exception import CapException, DependencyException, ConcurrencyException
 import time
 
 class TSCHSolver:
@@ -119,6 +120,42 @@ class TSCHSolver:
                 results.append(verified)
         return results
     
+    def new_verify(self, solution):
+        ts, ch = solution['timeslot_assignment'], solution['channel_assignment']
+        edges = self.network.get_edges()
+        errors = []
+        # try:
+        for tsi, edgei in zip(ts, edges):
+            # Check CAP constraint
+            if edgei.name != 'e0' and tsi == 0: #Add a function edge.is_cap()
+                error_message = f"CAP error raised with Timselot['{edgei}'] = {tsi}"
+                errors.append(error_message)
+                # raise CapException(edgei)
+            for tsj, edgej in zip(ts, edges):
+                nodei1, nodei2 = edgei.get_node1(), edgei.get_node2()
+                nodej1, nodej2 = edgej.get_node1(), edgej.get_node2()
+                # Check dependency constraints
+                if nodei1.is_tag() and nodej1.is_anchor() and nodei2 == nodej1:
+                    if int(tsi.as_long()) >= int(tsj.as_long()):
+                        error_message = f"Dependency error raised with Timselot['{edgei}'] >= Timselot['{edgej}']"
+                        errors.append(error_message)
+                        # raise DependencyException(edgei, edgej)
+                # Check concurrency constraints
+                if edgei != edgej and int(tsi.as_long()) == int(tsj.as_long()):
+                    if edgei != edgej and int(tsi.as_long()) == int(tsj.as_long()):
+                        nodes = {nodei1, nodei2, nodej1, nodej2}
+                        if len(nodes) < 4: 
+                            error_message = f"Concurrency error raised with Timselot['{edgei}'] = Timselot['{edgej}']"
+                            errors.append(error_message)
+                            # raise ConcurrencyException(edgei, edgej)
+            return errors
+        # except CapException as e:
+        #     print("Caught CapException:", str(e))
+        # except DependencyException as e:
+        #     print("Caught DependencyException:", str(e))
+        # except ConcurrencyException as e:
+        #     print("Caught ConcurrencyException:", str(e))
+    
     def display(self, solution):
         ts_list, ch_list = solution['timeslot_assignment'], solution['channel_assignment']
         edges = self.network.get_edges()
@@ -142,9 +179,15 @@ class TSCHSolver:
         print("+-------------------------------+")
         slotframe_length = self.get_tsch_parameters()['max_slots'] + 1
         slotframe_width = self.get_tsch_parameters()['max_channels'] + 1
+        timeslots_used  = 0
+        channels_used = 0
         cells_available = slotframe_length * slotframe_width
         cells_used = len(self.network.get_edges())
         occupancy_rate = cells_used / cells_available
+        timeslot_occupancy_rate = timeslots_used / slotframe_length
+        channel_occupancy_rate = channels_used / slotframe_width
         print(f"-> Number of cells available: {cells_available}")
         print(f"-> Number of cells used: {cells_used}")
         print(f"-> Slotframe occupancy rate: {round(occupancy_rate, 2) * 100} %")
+        print(f"-> Timeslot occupancy rate: {round(timeslot_occupancy_rate, 2) * 100} %")
+        print(f"-> Channel occupancy rate: {round(channel_occupancy_rate, 2) * 100} %")

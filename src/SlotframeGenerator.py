@@ -3,7 +3,7 @@ from Node import Tag, Anchor
 from TSCHSolver import TSCHSolver
 import json
 
-class Main:
+class SlotframeGenerator:
     def __init__(self, max_solutions=1, max_slots=4, max_channels=1):
         self.network = NetworkTopology()
         self.max_solutions = max_solutions

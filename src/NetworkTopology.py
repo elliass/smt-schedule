@@ -1,4 +1,5 @@
-from Communication import Communication
+from UWBCommunication import UWBCommunication, Ranging, Forwarding
+from Node import Node
 
 class NetworkTopology:
     def __init__(self):
@@ -6,19 +7,32 @@ class NetworkTopology:
         self.edges = []
         self.communication = []
 
-    def add_node(self, node):
+    def add_node(self, node:Node):
         self.nodes.append(node)
 
-    def add_edges(self, node1, node2):
+    def get_nodes(self) -> list[Node]:
+        return self.nodes
+
+    def add_edges(self, node1:Node, node2:Node):
         name = f"e{len(self.get_edges())}"
-        edge = Communication(node1, node2, name)
+        if node1.is_tag():
+            edge = Ranging(node1, node2, name)
+        else:
+            edge = Forwarding(node1, node2, name)
+        node1.set_communication(edge)
+        node2.set_communication(edge)
         self.edges.append(edge)
 
-    def get_edges(self):
+    def get_edges(self) -> list[UWBCommunication]:
         return self.edges
     
+    def get_communication_from_node(self, node:Node):
+        for n in self.get_nodes():
+            if node == n:
+                communications = [ communication.name for communication in node.get_communication()]
+                return communications
+        
     def get_edges_str(self):
-        # edges_str = [ f"e{edge}" for edge in range(1, len(self.edges) + 1) ]
         edges_str = [ edge.name for edge in self.edges ]
         return edges_str
 
@@ -28,10 +42,10 @@ class NetworkTopology:
             self.communication.append(node1.communicate(node2))
         return self.communication
 
-    def get_ranging(self) -> list[Communication]:
+    def get_ranging(self) -> list[UWBCommunication]:
         ranging = [ edge for edge in self.edges if edge.is_ranging()]
         return ranging
     
-    def get_forwarding(self) -> list[Communication]:
+    def get_forwarding(self) -> list[UWBCommunication]:
         forwarding = [ edge for edge in self.edges if edge.is_forwarding()]
         return forwarding

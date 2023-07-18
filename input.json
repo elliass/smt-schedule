@@ -1,0 +1,7 @@
+{
+    "cell1": {
+        "tags": ["t1"],
+        "anchors": ["a1","a2","a3"],
+        "parent": "a1"
+    }
+}
