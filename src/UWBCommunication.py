@@ -18,7 +18,10 @@ class UWBCommunication:
     
     def get_nodes(self):
         return (self.node1, self.node2)
-
+    
+    def is_cap(self):
+        return False
+    
     def is_ranging(self):
         return False
     
@@ -30,7 +33,17 @@ class UWBCommunication:
     
     def get_cell(self):
         return self.assigned_cell
+
+class CAP(UWBCommunication):
+    def is_cap(self):
+        return True
+
+    def get_tag(self):
+        return self.node1 
     
+    def get_anchor(self):
+        return self.node2
+
 class Ranging(UWBCommunication):
     def is_ranging(self):
         return True

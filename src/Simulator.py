@@ -96,56 +96,71 @@ class Main:
         # n = random.randint(0, len(solutions) - 1)
         n = 0
         return solutions[n]
+    
+    def simulate_network_activity(self, slotframe, slotframe_length):
+        timeslot_duration = 1
+        for timeslot in range(slotframe_length):
+            print(f"--- Timeslot {timeslot} ---")
+            for edge in self.network.get_edges():
+                node1, node2 = edge.get_node1(), edge.get_node2()
+                edge_timeslot, edge_channel = edge.get_cell()['timeslot'], edge.get_cell()['channel']
+                if edge_timeslot == timeslot :
+                    if edge.is_cap():
+                        payload = f"CAP_{node1}"
+                    if edge.is_ranging():
+                        payload = f"ToA_{node1}"
+                    if edge.is_forwarding():
+                        payload = f"Measurement_{node1}"
+                    transmission = node1.exchange(node2, payload)
+                    print(f"{edge}: {transmission} on ts={edge_timeslot}, ch={edge_channel}")
+                    # print(node2.get_queue())
+                    # time.sleep(timeslot_duration)
+                else:
+                    idx = int(edge.name[1:])
+                    slotframe['timeslot_assignment'][idx] = IntVal(timeslot)
+                    errors = self.tsch_solver.new_verify(slotframe)
+                    # print(errors)
+                    # if len(errors) == 0:
+                    #     print(f"Alternative slot available on ts={edge_timeslot}, ch={edge_channel} for {edge}")
+                    # else:
+                    #     print('Conflict with at least one constraint')
+                        # print(edge.name, timeslot, True)
+                        # transmission = node1.exchange(node2, payload)
+                        # print(f"{edge}: {transmission} on ts={edge_timeslot}, ch={edge_channel}")
 
 
 if __name__ == "__main__":
     main = Main(max_solutions=1, max_slots=4, max_channels=1)
     main.setup_topology()
     solutions, result_summary = main.run_tsch_algorithm()
-    slotframe_length = int(result_summary['nb_slots']) + 1
-    # main.display_solutions(solutions)
+    main.display_solutions(solutions)
     # main.display_last_solution(solutions)
     # verified = main.verify_solutions(solutions)
     # print(verified)
-    # main.analyze_tsch_algorithm(result_summary)
+    main.analyze_tsch_algorithm(result_summary)
 
-    
-    # Assign TSCH cells to each edge
-    slotframe = main.select_random_slotframe(solutions)
-    assigned_timeslots = slotframe['timeslot_assignment']
-    assigned_channels = slotframe['channel_assignment']
-    for edge, timeslot, channel in zip(main.network.get_edges(), assigned_timeslots, assigned_channels):
-        edge.set_cell(timeslot, channel)
-    
-    print("Old slotframe: ", slotframe['timeslot_assignment'])
+    # # Assign TSCH cells to each edge and simulate network activity
+    # slotframe_length = int(result_summary['nb_slots']) + 1
+    # slotframe = main.select_random_slotframe(solutions)
+    # assigned_timeslots = slotframe['timeslot_assignment']
+    # assigned_channels = slotframe['channel_assignment']
+    # for edge, timeslot, channel in zip(main.network.get_edges(), assigned_timeslots, assigned_channels):
+    #     edge.set_cell(timeslot, channel)
+    # main.simulate_network_activity(slotframe, slotframe_length)
 
-    # Simulate network activity
-    timeslot_duration = 1
-    for timeslot in range(slotframe_length):
-        print(f"--- Timeslot {timeslot} ---")
-        for edge in main.network.get_edges():
-            node1, node2 = edge.get_node1(), edge.get_node2()
-            edge_timeslot, edge_channel = edge.get_cell()['timeslot'], edge.get_cell()['channel']
-            if edge_timeslot == timeslot :
-                if edge.is_ranging():
-                    payload = f"ToA_{node1}"
-                if edge.is_forwarding():
-                    payload = f"Measurement_{node1}"
-                transmission = node1.exchange(node2, payload)
-                print(f"{edge}: {transmission} on ts={edge_timeslot}, ch={edge_channel}")
-                # print(node2.get_queue())
-                # time.sleep(timeslot_duration)
-            else:
-                idx = int(edge.name[1:])
-                slotframe['timeslot_assignment'][idx] = IntVal(timeslot)
-                errors = main.tsch_solver.new_verify(slotframe)
-                # if len(errors) == 0:
-                #     print(f"Alternative slot available on ts={edge_timeslot}, ch={edge_channel} for {edge}")
-                # else:
-                #     print('Conflict with at least one constraint')
-                    # print(edge.name, timeslot, True)
-                    # transmission = node1.exchange(node2, payload)
-                    # print(f"{edge}: {transmission} on ts={edge_timeslot}, ch={edge_channel}")
+    for node in main.network.get_nodes():
+        communications = [ communication.name for communication in node.get_communication()]
+        print(f"{node}: {communications}")
+    
+    for communication in main.network.get_edges():
+        if communication.is_cap():
+            print("-->", communication)
+
+
+
+
+
+
 
     # Show anchor queue
     # for node in main.network.get_nodes():

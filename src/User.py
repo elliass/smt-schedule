@@ -32,15 +32,15 @@ for cell_key, cell_value in cells.items():
     for tag_node in tag_nodes:
         network.add_edges(tag_node, parent_node)
 
-    # Add ranging communications
-    for tag_node in tag_nodes:
-        for anchor_node in anchors_nodes:
-            network.add_edges(tag_node, anchor_node)
+    # # Add ranging communications
+    # for tag_node in tag_nodes:
+    #     for anchor_node in anchors_nodes:
+    #         network.add_edges(tag_node, anchor_node)
     
-    # Add forwarding communications
-    for child_node in anchors_nodes:
-        if child_node != parent_node:
-            network.add_edges(child_node, parent_node)
+    # # Add forwarding communications
+    # for child_node in anchors_nodes:
+    #     if child_node != parent_node:
+    #         network.add_edges(child_node, parent_node)
 
     # result = []
     # for nodei in network.get_nodes():
@@ -55,16 +55,16 @@ for cell_key, cell_value in cells.items():
         #         result = list(set(communicationsi).symmetric_difference(set(communicationsj)))
         #         print(f"{nodej}: {communicationsj} --> {result}")
         
-    t1 = ['e0', 'e1', 'e2', 'e3']
-    a1 = ['e0', 'e1', 'e4', 'e5']
-    a2 = ['e2', 'e4']
-    a3 = ['e3', 'e5']
+    # t1 = ['e0', 'e1', 'e2', 'e3']
+    # a1 = ['e0', 'e1', 'e4', 'e5']
+    # a2 = ['e2', 'e4']
+    # a3 = ['e3', 'e5']
 
-    diff = list(set(t1).symmetric_difference(set(a1)))
-    diff = list(set(diff).symmetric_difference(set(a2)))
-    diff = list(set(diff).symmetric_difference(set(a3)))
+    # diff = list(set(t1).symmetric_difference(set(a1)))
+    # diff = list(set(diff).symmetric_difference(set(a2)))
+    # diff = list(set(diff).symmetric_difference(set(a3)))
 
-    print(diff)
+    # print(diff)
 
     # for node in network.get_nodes():
     #     for communication in node.get_communication():
@@ -76,8 +76,9 @@ for cell_key, cell_value in cells.items():
     #             print(f"{node}: {node.get_queue()}")
 
 
-    # print(network.get_communication_from_node(network.get_nodes()[0]))
-
+    # for node in network.get_nodes(): 
+    #     if node.is_tag():
+    #         print(node.get_communication()[0].is_ranging())
 
 
 # output = [

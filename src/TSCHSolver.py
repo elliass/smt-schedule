@@ -127,7 +127,7 @@ class TSCHSolver:
         # try:
         for tsi, edgei in zip(ts, edges):
             # Check CAP constraint
-            if edgei.name != 'e0' and tsi == 0: #Add a function edge.is_cap()
+            if not edgei.is_cap() and tsi == 0: #edgei.name != 'e0'
                 error_message = f"CAP error raised with Timselot['{edgei}'] = {tsi}"
                 errors.append(error_message)
                 # raise CapException(edgei)
@@ -148,7 +148,7 @@ class TSCHSolver:
                             error_message = f"Concurrency error raised with Timselot['{edgei}'] = Timselot['{edgej}']"
                             errors.append(error_message)
                             # raise ConcurrencyException(edgei, edgej)
-            return errors
+        return errors
         # except CapException as e:
         #     print("Caught CapException:", str(e))
         # except DependencyException as e:

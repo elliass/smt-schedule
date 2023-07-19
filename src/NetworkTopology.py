@@ -1,4 +1,4 @@
-from UWBCommunication import UWBCommunication, Ranging, Forwarding
+from UWBCommunication import UWBCommunication, CAP, Ranging, Forwarding
 from Node import Node
 
 class NetworkTopology:
@@ -16,7 +16,11 @@ class NetworkTopology:
     def add_edges(self, node1:Node, node2:Node):
         name = f"e{len(self.get_edges())}"
         if node1.is_tag():
-            edge = Ranging(node1, node2, name)
+            if len(node1.get_communication()) == 0: #and node1.get_parent() == node2 to make sure it is cap (set parent first)
+                # print(node1.get_parent())
+                edge = CAP(node1, node2, name)
+            else:
+                edge = Ranging(node1, node2, name)
         else:
             edge = Forwarding(node1, node2, name)
         node1.set_communication(edge)
