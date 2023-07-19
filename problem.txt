@@ -43,18 +43,18 @@ To do:
 - Allow parent - child forwarding communications to the root node
 
 - Add recursive parent_node forwarding communication
-- Change logic for constraints using node.get_communication
 - Add communication between root and root to simulate forwarding betwwen t1 and a1 and forwarding to localization engine
 
 - Generalize and Test solution reliability with complex topology
 - Sensitivity analysis and generate logs
-- Add a function edge.is_cap()
 
 
 Done:
 - Verify solution not working properly -> improve 
 - Handle exception (CAP, dependency, conflict exception) and create exception class
+- Add a function edge.is_cap()
 
 
 Remove
+- Change logic for constraints using node.get_communication
 - Update constraint generation using OOP
