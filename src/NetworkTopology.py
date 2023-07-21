@@ -12,15 +12,19 @@ class NetworkTopology:
 
     def get_nodes(self) -> list[Node]:
         return self.nodes
+    
+    def find_node_by_name(self, node_name:str):
+        for node in self.get_nodes():
+            if node.name == node_name:
+                return node
 
     def add_edges(self, node1:Node, node2:Node):
         name = f"e{len(self.get_edges())}"
         if node1.is_tag():
-            if len(node1.get_communication()) == 0: #and node1.get_parent() == node2 to make sure it is cap (set parent first)
-                # print(node1.get_parent())
-                edge = CAP(node1, node2, name)
-            else:
-                edge = Ranging(node1, node2, name)
+            # if len(node1.get_communication()) == 0: REMOVED CAP #and node1.get_parent() == node2 to make sure it is cap (set parent first)
+            #     edge = CAP(node1, node2, name)
+            # else:
+            edge = Ranging(node1, node2, name)
         else:
             edge = Forwarding(node1, node2, name)
         node1.set_communication(edge)

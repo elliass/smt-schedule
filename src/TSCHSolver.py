@@ -4,11 +4,12 @@ from Exception import CapException, DependencyException, ConcurrencyException
 import time
 
 class TSCHSolver:
-    def __init__(self, network, max_solutions, max_slots, max_channels):
+    def __init__(self, network, max_solutions, max_slots, max_channels, max_retries):
         self.network = network
         self.max_solutions = max_solutions
         self.max_slots = max_slots
         self.max_channels = max_channels
+        self.max_retries = max_retries
         self.model_constraints = []
         self.tsch_parameters = {}
 
@@ -78,7 +79,7 @@ class TSCHSolver:
         # Run solver while solution not found or max retries reached (set to 5)
         found = False
         retries = 0
-        while not found and retries < 5:
+        while not found and retries < self.max_retries:
             solutions, result_summary = self.find_feasible_schedules(self.max_slots, self.max_channels, retries)
             if len(solutions) > 0:
                 found = True
@@ -93,42 +94,16 @@ class TSCHSolver:
         if not found:
             result_summary['retries'] = "Number of maximum retries reached"
         return solutions, result_summary
-
     
     def verify(self, solution):
-        ts_list, ch_list = solution['timeslot_assignment'], solution['channel_assignment']
-        edges = self.network.get_edges()
-        results = []
-        for ts_i, ch_i, edge_i in zip(ts_list, ch_list, edges):
-            for ts_j, ch_j, edge_j in zip(ts_list, ch_list, edges):
-                verified = True
-                node1i, node2i, node1j, node2j = edge_i.get_node1(), edge_i.get_node2(), edge_j.get_node1(), edge_j.get_node2()
-
-                # Verify CAP, dependency, conflict and concurrency
-                if edge_j.name == 'e0' and int(ts_j.as_long()) != 0 and int(ch_j.as_long()) != 0:   # if e0 is reserved for CAP 0,0
-                    verified = False
-                    print("1 - CAP error", edge_j, ts_j, ch_j)
-                elif node2i == node1j and int(ts_i.as_long()) > int(ts_j.as_long()):                # if nodes are same and timeslot of ranging > forwarding
-                    verified = False
-                    print("2 - Dependency error", edge_j, ts_j, ch_j)
-                elif edge_i != edge_j and int(ts_i.as_long()) == int(ts_j.as_long()):               # if not self and edges has same assigned timeslot
-                    if int(ch_i.as_long()) != int(ch_j.as_long()):                                  # but channels are different
-                        nodes = {node1i, node2i, node1j, node2j}                                    # put nodes in set to remove duplicates
-                        if len(nodes) < 4:                                                          # if all nodes are different
-                            verified = False
-                            print("3 - Concurrency error", edge_j, ts_j, ch_j)
-                results.append(verified)
-        return results
-    
-    def new_verify(self, solution):
         ts, ch = solution['timeslot_assignment'], solution['channel_assignment']
         edges = self.network.get_edges()
         errors = []
         # try:
         for tsi, edgei in zip(ts, edges):
-            # Check CAP constraint
+            # Check shared constraint
             if not edgei.is_cap() and tsi == 0: #edgei.name != 'e0'
-                error_message = f"CAP error raised with Timselot['{edgei}'] = {tsi}"
+                error_message = f"Shared error raised with Timselot['{edgei}'] = {tsi}"
                 errors.append(error_message)
                 # raise CapException(edgei)
             for tsj, edgej in zip(ts, edges):

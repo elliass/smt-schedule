@@ -5,17 +5,14 @@ class TSCHSchedule:
         self.network = network
         self.max_slots = max_slots
         self.max_channels = max_channels
-        self.communication_edges = []
+        
         self.default_constraints = []
         self.dependency_constraints = []
         self.conflict_constraints = []
         self.timeslot_constraints = []
         self.channel_constraints = []
         self.model_constraints = []
-        self.tsch_parameters = {}
-
-    def add_communication_edge(self, edge):
-        self.communication_edges.append(edge)
+        # self.tsch_parameters = {}
 
     def get_assignments(self):
         # Define variables to represent the assignment of each communication
@@ -55,14 +52,15 @@ class TSCHSchedule:
         time_domain_constraint = [ And(0 <= timeslots[i], timeslots[i] <= self.max_slots) for i in range(len(edges)) ]
         frequency_domain_constraint = [ And(0 <= channels[i], channels[i] <= self.max_channels) for i in range(len(edges)) ]
 
-        # Cell (0,0) is reserved for CAP and always equal to 0
-        cap_constraint = [ And(timeslots[0] == 0, channels[0] == 0) ]
+        # # Cell (0,0) is reserved for CAP and always equal to 0 REMOVED CAP
+        # cap_constraint = [ And(timeslots[0] == 0, channels[0] == 0) ]
 
         # Timeslot 0 is reserved for shared communications
-        shared_constraint = [ timeslots[i] != 0 for i in range(len(edges)) if i != 0 ]
+        # shared_constraint = [ timeslots[i] != 0 for i in range(len(edges)) if i != 0 ] REMOVED CAP
+        shared_constraint = [ timeslots[i] != 0 for i in range(len(edges)) ]
 
         # Add default constraints to the model
-        constraint = time_domain_constraint + frequency_domain_constraint + cap_constraint + shared_constraint
+        constraint = time_domain_constraint + frequency_domain_constraint + shared_constraint # + cap_constraint REMOVED CAP
         self.default_constraints.extend(constraint)
         return self.default_constraints
     
@@ -79,9 +77,7 @@ class TSCHSchedule:
     def get_dependency_constraints(self):
         timeslots, _ = self.get_timeslots_channels()
         communications = self.network.get_communication()
-        # print(communications)
         edges = self.network.get_edges()
-        # print(edges)
         for edge_u, communication_u in zip(edges, communications):
             for edge_v, communication_v in zip(edges, communications):
                 _, node_u = communication_u
@@ -89,7 +85,6 @@ class TSCHSchedule:
                 if node_u == node_v:
                     constraints = [ timeslots[self.to_int(edge_u.name)] < timeslots[self.to_int(edge_v.name)] ]
                     self.dependency_constraints.extend(constraints)
-        # print(self.dependency_constraints)
         return self.dependency_constraints
     
     def get_conflict_constraints(self):
