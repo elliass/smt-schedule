@@ -1,6 +1,8 @@
 from NetworkTopology import NetworkTopology
 from Node import Tag, Anchor
 from TSCHSolver import TSCHSolver
+from Displayer import Displayer
+
 import json
 import random
 import time
@@ -43,7 +45,9 @@ class Main:
             # Add nodes to network topology
             nodes = anchors_nodes + tag_nodes
             for node in nodes:
-                self.network.add_node(node)
+                found = self.network.find_node_by_name(node.name)
+                if found is None:
+                    self.network.add_node(node)
             
             # Set parent node
             for node in nodes:
@@ -63,10 +67,22 @@ class Main:
                 for anchor_node in anchors_nodes:
                     self.network.add_edges(tag_node, anchor_node)
             
-            # Add forwarding communications
-            for anchor_node in anchors_nodes:
-                if anchor_node !=  anchor_node.get_parent(): # exclude root communication a1 -> a1
-                    self.network.add_edges(anchor_node, anchor_node.get_parent())
+            # # Add forwarding communications
+            # for anchor_node in anchors_nodes:
+            #     if anchor_node !=  anchor_node.get_parent(): # exclude root communication a1 -> a1
+            #         self.network.add_edges(anchor_node, anchor_node.get_parent())
+
+    def traverse_node_tree(self, node, root):
+        if node.is_anchor() and node.name != root:
+            # print(f"{node} -> {node.parent}")
+            self.network.add_edges(node, node.parent)
+            self.traverse_node_tree(node.parent, root)
+
+    def setup_forwarding_tree(self):
+        root = "a1"
+        for node in self.network.get_nodes():
+            if node.is_anchor() and node.name != root:
+                self.traverse_node_tree(node, root)
 
     def run_tsch_algorithm(self):
         # Find feasible solutions
@@ -142,25 +158,13 @@ class Main:
                         # transmission = node1.exchange(node2, payload)
                         # print(f"{edge}: {transmission} on ts={edge_timeslot}, ch={edge_channel}")
 
-    def display_network(self):
-        print("\n--- Network ---")
-        for node in self.network.get_nodes():
-            communications = [ communication.name for communication in node.get_communication()]
-            # print(f"{node}: {communications}")
-        
-        for communication in self.network.get_edges():
-            # if communication.is_cap(): REMOVED CAP
-            #     print(f"CAP {communication} | {communication.get_node1()} <-> {communication.get_node2()}")
-            if communication.is_ranging():
-                print(f"RAN {communication} | {communication.get_node1()} <-> {communication.get_node2()}")
-            if communication.is_forwarding():
-                print(f"FOR {communication} | {communication.get_node1()} -> {communication.get_node2()}")
-
 
 if __name__ == "__main__":
-    # Initialize network topology
-    main = Main(max_solutions=1, max_slots=4, max_channels=1, max_retries=5)
+    # Initialize network topology and forwarding tree
+    main = Main(max_solutions=1, max_slots=4, max_channels=1, max_retries=20)
+    network = main.network
     main.setup_topology('../input.json')
+    main.setup_forwarding_tree()
 
     # Trigger TSCH algorithm and show solutions
     solutions, result_summary = main.run_tsch_algorithm()
@@ -169,8 +173,10 @@ if __name__ == "__main__":
     # # verified = main.verify_solutions(solutions)
     # # print(verified)
 
+
     # Display scheduling algorithm results
     main.analyze_tsch_algorithm(result_summary)
+
 
     # # Assign TSCH cells to each edge and simulate network activity
     # slotframe_length = int(result_summary['nb_slots']) + 1
@@ -181,15 +187,16 @@ if __name__ == "__main__":
     #     edge.set_cell(timeslot, channel)
     # main.simulate_network_activity(slotframe, slotframe_length)
 
+
     # Display network communications
-    main.display_network()
+    main.network.display_network()
 
-    # for c in main.network.get_communication():
-    #     print(c)
+    # Display solutions
+    solution = solutions[0]
+    displayer = Displayer(network)
+    displayer.display_solution(solution)
+    # displayer.show_as_table(solutions[0])
 
-    # for node in main.network.get_nodes():
-    #     if node.is_anchor():
-    #         print(node, ":", node.get_parent())
 
 
 
