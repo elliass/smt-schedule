@@ -10,5 +10,11 @@
         "anchors": ["a2","a3","a4"],
         "parent": "a3",
         "next_parent": "a1"
+    },
+    "cell3": {
+        "tags": ["t3"],
+        "anchors": ["a3","a4","a5"],
+        "parent": "a3",
+        "next_parent": "a1"
     }
 }

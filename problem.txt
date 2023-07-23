@@ -34,25 +34,22 @@ Evaluate quality
 
 To do: 
 - Log results for each run to gather metrics for evaluation 
-- Give the possibility to increase the problem and analyse the sensibility
-- Add more UWB functionality
-- Allow CAP
-- Shared network control communications
-- Allow mulitple tags per cells
-- Allow cross cell communications
-- Allow parent - child forwarding communications to the root node
-
-- Add recursive parent_node forwarding communication
-- Add communication between root and root to simulate forwarding betwwen t1 and a1 and forwarding to localization engine
-
-- Generalize and Test solution reliability with complex topology
 - Sensitivity analysis and generate logs
+- Give the possibility to increase the problem and analyse the sensibility
+- Generalize and Test solution reliability with complex topology
+- Allow cross cell communications
+
 
 
 Done:
 - Verify solution not working properly -> improve 
 - Handle exception (CAP, dependency, conflict exception) and create exception class
 - Add a function edge.is_cap()
+- Add communication between root and root to simulate forwarding betwwen t1 and a1 and forwarding to localization engine
+(not included but just need to remove condition in setup_topology: Add forwarding communications)
+- Allow parent - child forwarding communications to the root node
+- Add recursive parent_node forwarding communication 
+- Shared network control communications
 
 
 Remove
