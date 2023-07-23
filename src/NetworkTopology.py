@@ -57,19 +57,3 @@ class NetworkTopology:
     def get_forwarding(self) -> list[UWBCommunication]:
         forwarding = [ edge for edge in self.edges if edge.is_forwarding()]
         return forwarding
-    
-    def display_network(self):
-        print("\n--- Network ---")
-        # nodes = self.get_nodes()
-        # for node in self.get_nodes():
-        #     communications = [ communication.name for communication in node.get_communication()]
-            # print(f"{node}: {communications}")
-
-        edges = self.get_edges()
-        for communication in edges:
-            # if communication.is_cap(): REMOVED CAP
-            #     print(f"CAP {communication} | {communication.get_node1()} <-> {communication.get_node2()}")
-            if communication.is_ranging():
-                print(f"RAN {communication} | {communication.get_node1()} <-> {communication.get_node2()}")
-            if communication.is_forwarding():
-                print(f"FOR {communication} | {communication.get_node1()} -> {communication.get_node2()}")

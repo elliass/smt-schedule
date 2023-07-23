@@ -1,6 +1,5 @@
 from z3 import Solver, Int, Or, Sum, If, Optimize, sat
 from TSCHSchedule import TSCHSchedule
-from Solution import Solution
 from Exception import CapException, DependencyException, ConcurrencyException
 import time
 
@@ -13,7 +12,6 @@ class TSCHSolver:
         self.max_retries = max_retries
         self.model_constraints = []
         self.tsch_parameters = {}
-        self.solutions = []
 
     def get_tsch_parameters(self):
         self.tsch_parameters['max_slots'] = self.max_slots
@@ -39,11 +37,12 @@ class TSCHSolver:
         solver.minimize(Sum(timeslots))
 
         # Evaluate model
+        solutions = []
         counter = 0
 
         # Iterate over each pair of slot_assignment and channel_assignment
         while counter < self.max_solutions and solver.check() == sat:
-            solution = Solution()
+            solution = {}
 
             # Get the model with the assigned values
             model = solver.model()
@@ -55,7 +54,7 @@ class TSCHSolver:
             # Add the solution to the list
             solution['timeslot_assignment'] = timeslot_values
             solution['channel_assignment'] = channel_values
-            self.solutions.append(solution)
+            solutions.append(solution)
 
             # Add blocking clause to prevent finding the same solution again
             blocking_clauses = [Or(timeslots[i] != timeslot_values[i], channels[i] != channel_values[i]) for i in range(len(edges))]
@@ -65,13 +64,13 @@ class TSCHSolver:
             counter += 1
         # Return solutions, nb_constraints, slotframe_parameters, processing time
         result_summary = {
-            'nb_solutions': len(self.solutions),
+            'nb_solutions': len(solutions),
             'nb_constraints': len(constraints),
             'nb_slots': max_slots,
             'nb_channels': max_channels,
             'nb_retries': retries
         }
-        return self.solutions, result_summary
+        return solutions, result_summary
     
     def run_solver(self):
         # Capture the start time

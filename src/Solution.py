@@ -1,8 +1,7 @@
 from prettytable import PrettyTable, FRAME, ALL
 
 class Solution:
-    def __init__(self, network):
-        self.network = network
+    def __init__(self):
         self.timeslot_assignment = []
         self.channel_assignment = []
     
@@ -18,20 +17,13 @@ class Solution:
     def get_channel(self):
         return self.channel_assignment
     
-    def show_as_table(self, data):
+    def show_as_table(self, edges):
+        print("+-------------------------------+")
+        print("| Slotframe                     |")
+        print("+-------------------------------+")
+
         # List of tuples to display in matrix
-        data = [
-            ('e0',2,0),
-        ('e1',3,0),
-        ('e2',1,1),
-        ('e3',2,2),
-        ('e4',3,3),
-        ('e5',1,0),
-        ('e6',6,2),
-        ('e7',5,0),
-        ('e8',2,3),
-        ('e9',4,3),
-        ]
+        data = self.get_solution(edges)
 
         # Extract the x, y, and value components from the tuples
         values, x_coords, y_coords = zip(*data)
@@ -60,9 +52,51 @@ class Solution:
         print(table)
 
 
-    def display_solution(self, solution):
-        ts_list, ch_list = solution['timeslot_assignment'], solution['channel_assignment']
-        edges = self.network.get_edges()
-        for ts, ch, edge in zip(ts_list, ch_list, edges):
-            # print(f"('{edge}',{ts},{ch}),")
-            print(f"{edge}: ({ts},{ch})")
+    def display_solution(self, edges):
+        timeslots, channels = self.get_timeslot(), self.get_channel()
+        for timeslot, channel, edge in zip(timeslots, channels, edges):
+            print(" " * 10 , f"{edge}: ({timeslot},{channel})")
+    
+    def get_solution(self, edges):
+        timeslots, channels = self.get_timeslot(), self.get_channel()
+        data = []
+        for timeslot, channel, edge in zip(timeslots, channels, edges):
+            tuple_solution = (edge.name,int(timeslot.as_long()),int(channel.as_long()))
+            data.append(tuple_solution)
+        return data
+
+    def verify_solution(self, edges):
+        timeslots = self.get_timeslot()
+        # edges = self.network.get_edges()
+        errors = []
+        # try:
+        for tsi, edgei in zip(timeslots, edges):
+            # Check shared constraint
+            if not edgei.is_cap() and tsi == 0: #edgei.name != 'e0'
+                error_message = f"Shared error raised with Timselot['{edgei}'] = {tsi}"
+                errors.append(error_message)
+                # raise CapException(edgei)
+            for tsj, edgej in zip(timeslots, edges):
+                nodei1, nodei2 = edgei.get_node1(), edgei.get_node2()
+                nodej1, nodej2 = edgej.get_node1(), edgej.get_node2()
+                # Check dependency constraints
+                if nodei1.is_tag() and nodej1.is_anchor() and nodei2 == nodej1:
+                    if int(tsi.as_long()) >= int(tsj.as_long()):
+                        error_message = f"Dependency error raised with Timselot['{edgei}'] >= Timselot['{edgej}']"
+                        errors.append(error_message)
+                        # raise DependencyException(edgei, edgej)
+                # Check concurrency constraints
+                if edgei != edgej and int(tsi.as_long()) == int(tsj.as_long()):
+                    if edgei != edgej and int(tsi.as_long()) == int(tsj.as_long()):
+                        nodes = {nodei1, nodei2, nodej1, nodej2}
+                        if len(nodes) < 4: 
+                            error_message = f"Concurrency error raised with Timselot['{edgei}'] = Timselot['{edgej}']"
+                            errors.append(error_message)
+                            # raise ConcurrencyException(edgei, edgej)
+        return errors
+        # except CapException as e:
+        #     print("Caught CapException:", str(e))
+        # except DependencyException as e:
+        #     print("Caught DependencyException:", str(e))
+        # except ConcurrencyException as e:
+        #     print("Caught ConcurrencyException:", str(e))

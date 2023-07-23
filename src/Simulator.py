@@ -11,20 +11,22 @@ from z3 import IntVal
 
 class Main:
     def __init__(self, max_solutions=1, max_slots=4, max_channels=1, max_retries=5):
-        self.network = NetworkTopology()
         self.max_solutions = max_solutions
         self.max_slots = max_slots
         self.max_channels = max_channels
         self.max_retries = max_retries
+        self.network = NetworkTopology()
         self.tsch_solver = TSCHSolver(self.network, max_solutions, self.max_slots, self.max_channels, self.max_retries)
     
+
     def read_topology(self, input_file):
         # Read JSON file with topology definition
         with open(input_file, 'r') as file:
             cells = json.load(file)
         return cells
 
-    def setup_topology(self, input_file):
+
+    def setup_network_topology(self, input_file):
         cells = self.read_topology(input_file)
 
         for cell_key, cell_value in cells.items():
@@ -36,11 +38,6 @@ class Main:
             # Initialize nodes
             tag_nodes = [ Tag(tag) for tag in tags ]
             anchors_nodes = [ Anchor(anchors) for anchors in anchors ]
-
-            # # Set parent node
-            # for anchor in anchors_nodes:
-            #     if anchor.name == parent:
-            #         parent_node = anchor
 
             # Add nodes to network topology
             nodes = anchors_nodes + tag_nodes
@@ -66,11 +63,7 @@ class Main:
             for tag_node in tag_nodes:
                 for anchor_node in anchors_nodes:
                     self.network.add_edges(tag_node, anchor_node)
-            
-            # # Add forwarding communications
-            # for anchor_node in anchors_nodes:
-            #     if anchor_node !=  anchor_node.get_parent(): # exclude root communication a1 -> a1
-            #         self.network.add_edges(anchor_node, anchor_node.get_parent())
+
 
     def traverse_node_tree(self, node, root):
         if node.is_anchor() and node.name != root:
@@ -78,55 +71,27 @@ class Main:
             self.network.add_edges(node, node.parent)
             self.traverse_node_tree(node.parent, root)
 
+
     def setup_forwarding_tree(self):
         root = "a1"
         for node in self.network.get_nodes():
             if node.is_anchor() and node.name != root:
                 self.traverse_node_tree(node, root)
 
+
     def run_tsch_algorithm(self):
         # Find feasible solutions
-        solutions, result_summary = self.tsch_solver.run_solver()
-        return solutions, result_summary
+        # solutions, result_summary = self.tsch_solver.run_solver()
+        self.tsch_solver.run_solver()
 
-    def display_solutions(self, solutions):
-        for idx, solution in enumerate(solutions):
-            print(f"--- Solution {idx+1} ---")
-            self.tsch_solver.display(solution)
-            print()
-            results = self.tsch_solver.verify(solution)
-            if results.__contains__(False):
-                print("+-------------------------------+")
-                print("| Solution is not verified      |")
-                print("+-------------------------------+")
-                break
-        print("+-------------------------------+")
-        print("| All solutions are verified    |")
-        print("+-------------------------------+")
 
-    def verify_solutions(self, solutions):
-        for solution in solutions:
-            results = self.tsch_solver.verify(solution)
-            if results.__contains__(False):
-                return False
-        return True
-
-    def display_last_solution(self, solutions):
-        found = len(solutions)
-        if found > 0:
-            print(f"--- Solution {found} ---")
-            self.tsch_solver.display(solutions[found-1])
-            print()
-
-    def analyze_tsch_algorithm(self, result_summary):
-        self.tsch_solver.summarize(result_summary)
-        self.tsch_solver.assess_quality()
-
-    def select_random_slotframe(self, solutions):
+    def select_random_solution(self):
         # n = random.randint(0, len(solutions) - 1)
+        solutions = self.tsch_solver.get_solutions()
         n = 0
         return solutions[n]
     
+
     def simulate_network_activity(self, slotframe, slotframe_length):
         timeslot_duration = 1
         for timeslot in range(slotframe_length):
@@ -160,24 +125,34 @@ class Main:
 
 
 if __name__ == "__main__":
-    # Initialize network topology and forwarding tree
+    # Initialize network and solver parameters
     main = Main(max_solutions=1, max_slots=4, max_channels=1, max_retries=20)
     network = main.network
-    main.setup_topology('../input.json')
+    tsch_solver = main.tsch_solver
+
+    # Setup network topology and forwarding tree
+    main.setup_network_topology('../input.json')
     main.setup_forwarding_tree()
 
     # Trigger TSCH algorithm and show solutions
-    solutions, result_summary = main.run_tsch_algorithm()
-    main.display_solutions(solutions)
-    # # main.display_last_solution(solutions)
-    # # verified = main.verify_solutions(solutions)
-    # # print(verified)
+    main.run_tsch_algorithm()
 
+    # Display and verify solutions
+    displayer = Displayer(network, tsch_solver)
+    displayer.display_all_solutions()
+    verified = displayer.verify_all_solutions()
+
+    # Display network communications
+    displayer.display_network()
 
     # Display scheduling algorithm results
-    main.analyze_tsch_algorithm(result_summary)
+    displayer.summarize()
+    displayer.assess_quality()
 
-
+    # Display selected solution
+    slotframe = main.select_random_solution()
+    slotframe.show_as_table(network.get_edges())
+    
     # # Assign TSCH cells to each edge and simulate network activity
     # slotframe_length = int(result_summary['nb_slots']) + 1
     # slotframe = main.select_random_slotframe(solutions)
@@ -187,15 +162,6 @@ if __name__ == "__main__":
     #     edge.set_cell(timeslot, channel)
     # main.simulate_network_activity(slotframe, slotframe_length)
 
-
-    # Display network communications
-    main.network.display_network()
-
-    # Display solutions
-    solution = solutions[0]
-    displayer = Displayer(network)
-    displayer.display_solution(solution)
-    # displayer.show_as_table(solutions[0])
 
 
 
