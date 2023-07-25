@@ -1,0 +1,13 @@
++-------------------------------+
+| Network communications        |
++-------------------------------+
+RAN e0 | t1 <-> a1
+RAN e1 | t1 <-> a2
+RAN e2 | t1 <-> a3
+RAN e3 | t2 <-> a2
+RAN e4 | t2 <-> a3
+RAN e5 | t2 <-> a4
+FOR e6 | a2 -> a1
+FOR e7 | a3 -> a1
+FOR e8 | a4 -> a3
+FOR e9 | a3 -> a1

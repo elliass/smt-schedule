@@ -1,0 +1,40 @@
++-------------------------------+
+| Summary input2_1.json            |
++-------------------------------+
+- Solver results 
+  - Processing_time: 0.3166227340698242
+  - Number of edges: 10
+  - Number of communications: 10
+  - Number of solutions: 1
+  - Number of constraints: 153
+  - Number of slots: 6
+  - Number of channels: 3
+  - Number of retries: 2
+  - Edges: ['e0', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9']
+  - Communications: [['t1', 'a1'], ['t1', 'a2'], ['t1', 'a3'], ['t2', 'a2'], ['t2', 'a3'], ['t2', 'a4'], ['a2', 'a1'], ['a3', 'a1'], ['a4', 'a3'], ['a3', 'a1']]
+
+- Slotframe quality 
+  - Number of cells available: 24
+  - Number of cells used: 10
+  - Slotframe occupancy rate: 42.0%
+ 
++-------------------------------+
+| Summary input2_2.json            |
++-------------------------------+
+- Solver results 
+  - Processing_time: 2.785252809524536
+  - Number of edges: 16
+  - Number of communications: 16
+  - Number of solutions: 1
+  - Number of constraints: 358
+  - Number of slots: 7
+  - Number of channels: 4
+  - Number of retries: 3
+  - Edges: ['e0', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'e11', 'e12', 'e13', 'e14', 'e15']
+  - Communications: [['t1', 'a1'], ['t1', 'a2'], ['t1', 'a3'], ['t2', 'a1'], ['t2', 'a2'], ['t2', 'a3'], ['t3', 'a2'], ['t3', 'a3'], ['t3', 'a4'], ['t4', 'a2'], ['t4', 'a3'], ['t4', 'a4'], ['a2', 'a1'], ['a3', 'a1'], ['a4', 'a3'], ['a3', 'a1']]
+
+- Slotframe quality 
+  - Number of cells available: 35
+  - Number of cells used: 16
+  - Slotframe occupancy rate: 46.0%
+ 

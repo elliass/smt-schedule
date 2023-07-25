@@ -1,0 +1,14 @@
+{
+    "cell1": {
+        "tags": ["t1"],
+        "anchors": ["a1","a2","a3"],
+        "parent": "a1",
+        "next_parent": "a1"
+    },
+    "cell2": {
+        "tags": ["t2"],
+        "anchors": ["a2","a3","a4"],
+        "parent": "a3",
+        "next_parent": "a1"
+    }
+}
