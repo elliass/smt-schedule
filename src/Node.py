@@ -48,7 +48,6 @@ class Node(ABC):
 
 class Tag(Node):
     def communicate(self, other):
-        # print(f"{self.name} -> {other}")
         return (self.name, other.name)
     
     def exchange(self, other, payload):
@@ -61,7 +60,6 @@ class Tag(Node):
 
 class Anchor(Node):
     def communicate(self, other):
-        # print(f"{self.name} -> {other}")
         return (self.name, other.name)
     
     def exchange(self, other, payload):

@@ -1,7 +1,6 @@
-from z3 import Solver, Int, Or, Sum, If, Optimize, sat
+from z3 import Or, Sum, Optimize, sat
 from TSCHSchedule import TSCHSchedule
-from Solution import Solution
-from Exception import CapException, DependencyException, ConcurrencyException
+from Slotframe import Slotframe
 import time
 
 class TSCHSolver:
@@ -16,22 +15,38 @@ class TSCHSolver:
         self.solutions = []
         self.result_summary = {}
 
+
     def get_tsch_parameters(self):
         self.tsch_parameters['max_slots'] = self.max_slots
         self.tsch_parameters['max_channels'] = self.max_channels
         return self.tsch_parameters
     
+
     def get_solutions(self):
         return self.solutions
     
+
     def get_result_summary(self):
         return self.result_summary
+    
+
+    def solutions_to_string(self):
+        solutions_to_string = []
+        for solution in self.solutions:
+            solution_to_string = {} 
+            solution_to_string['timeslot'] = solution.get_timeslot_to_string()
+            solution_to_string['channel'] = solution.get_channel_to_string()
+            solutions_to_string.append(solution_to_string)
+        return solutions_to_string
+
 
     def find_feasible_schedules(self, max_slots, max_channels, retries):
         # Initialize TSCH schedule
         tsch_schedule = TSCHSchedule(self.network, max_slots, max_channels)
         timeslots, channels = tsch_schedule.get_timeslots_channels()
         edges = self.network.get_edges()
+        edges_str = self.network.get_edges_str()
+        communications = self.network.get_communication()
         
         # Compute and return all model constraints
         constraints = tsch_schedule.compute()
@@ -50,7 +65,7 @@ class TSCHSolver:
 
         # Iterate over each pair of slot_assignment and channel_assignment
         while counter < self.max_solutions and solver.check() == sat:
-            solution = Solution()
+            solution = Slotframe()
 
             # Get the model with the assigned values
             model = solver.model()
@@ -70,16 +85,22 @@ class TSCHSolver:
             solver.add(blocking_clause)
 
             counter += 1
-
+        
         self.result_summary = {
+            'nb_edges': len(edges),
+            'nb_communications': len(communications),
             'nb_solutions': len(self.solutions),
             'nb_constraints': len(constraints),
             'nb_slots': max_slots,
             'nb_channels': max_channels,
-            'nb_retries': retries
+            'nb_retries': retries,
+            'edges': edges_str,
+            'communications': communications,
+            'solutions': self.solutions_to_string(),
         }
         return self.solutions, self.result_summary
     
+
     def run_solver(self):
         # Capture the start time
         start_time = time.time()
@@ -101,5 +122,4 @@ class TSCHSolver:
         self.result_summary['processing_time'] = end_time - start_time
         if not found:
             self.result_summary['retries'] = "Number of maximum retries reached"
-        # return solutions, result_summary
     

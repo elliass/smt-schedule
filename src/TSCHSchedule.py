@@ -12,7 +12,6 @@ class TSCHSchedule:
         self.timeslot_constraints = []
         self.channel_constraints = []
         self.model_constraints = []
-        # self.tsch_parameters = {}
 
     def get_assignments(self):
         # Define variables to represent the assignment of each communication

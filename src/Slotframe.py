@@ -1,6 +1,6 @@
-from prettytable import PrettyTable, FRAME, ALL
+from prettytable import PrettyTable, ALL
 
-class Solution:
+class Slotframe:
     def __init__(self):
         self.timeslot_assignment = []
         self.channel_assignment = []
@@ -10,6 +10,12 @@ class Solution:
     
     def get_timeslot(self):
         return self.timeslot_assignment
+    
+    def get_timeslot_to_string(self):
+        timeslot_assignment_to_string = []
+        for timeslot in self.timeslot_assignment:
+            timeslot_assignment_to_string.append(timeslot.as_long())
+        return timeslot_assignment_to_string
         
     def set_channel(self, channel_assignment):
         self.channel_assignment = channel_assignment
@@ -17,13 +23,15 @@ class Solution:
     def get_channel(self):
         return self.channel_assignment
     
-    def show_as_table(self, edges):
-        print("+-------------------------------+")
-        print("| Slotframe                     |")
-        print("+-------------------------------+")
-
+    def get_channel_to_string(self):
+        channel_assignment_to_string = []
+        for channel in self.channel_assignment:
+            channel_assignment_to_string.append(channel.as_long())
+        return channel_assignment_to_string
+    
+    def show_as_table(self, edges, communications):
         # List of tuples to display in matrix
-        data = self.get_solution(edges)
+        data = self.get_solution(edges, communications)
 
         # Extract the x, y, and value components from the tuples
         values, x_coords, y_coords = zip(*data)
@@ -47,9 +55,7 @@ class Solution:
         # Rename the headers
         headers = ['ch/ts'] + ['slot ' + str(x) for x in range(matrix_size[1])]
         table.field_names = headers
-
-        # Print the table
-        print(table)
+        return table
 
 
     def display_solution(self, edges):
@@ -57,15 +63,16 @@ class Solution:
         for timeslot, channel, edge in zip(timeslots, channels, edges):
             print(" " * 10 , f"{edge}: ({timeslot},{channel})")
     
-    def get_solution(self, edges):
+    def get_solution(self, edges, communications):
         timeslots, channels = self.get_timeslot(), self.get_channel()
         data = []
-        for timeslot, channel, edge in zip(timeslots, channels, edges):
-            tuple_solution = (edge.name,int(timeslot.as_long()),int(channel.as_long()))
+        for timeslot, channel, edge, communication in zip(timeslots, channels, edges, communications):
+            value = f"{edge}: {communication[0]} -> {communication[1]}"
+            tuple_solution = (value, int(timeslot.as_long()), int(channel.as_long()))
             data.append(tuple_solution)
         return data
 
-    def verify_solution(self, edges):
+    def verify_slotframe(self, edges):
         timeslots = self.get_timeslot()
         # edges = self.network.get_edges()
         errors = []

@@ -1,5 +1,3 @@
-from abc import ABC, abstractmethod
-
 class UWBCommunication:
     def __init__(self, node1, node2, name):
         self.node1 = node1
