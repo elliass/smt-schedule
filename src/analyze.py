@@ -1,4 +1,9 @@
 import json
+import numpy as np
+import matplotlib.pyplot as plt
+from prettytable import PrettyTable
+import pandas as pd
+
 
 def read_from_json(input_file):
     with open(input_file, 'r') as file:
@@ -13,9 +18,13 @@ def write_to_text(data, output_file):
     with open(output_file, 'w') as file:
         file.write(data)
 
-logs = read_from_json('../out/logs.json')
-summary_file = '../out/summary.txt'
-# write_to_text("", summary_file)
+FOLDER = "binary_tree"
+logs = read_from_json(f"../definition/{FOLDER}/output/logs.json")
+summary_file = f"../definition/{FOLDER}/output/summary.txt"
+table_file = f"../definition/{FOLDER}/output/table.txt"
+write_to_text("", summary_file)
+myTable = PrettyTable(["Id", "Topology", "Edges", "Constraints", "Timeslots", "Channels", "Cells available", "Cells used", "Occupancy rate", "Processing time", "Found"])
+idx = 0
 
 for key, value in logs.items():
     slotframe_length = value.get('nb_slots', "")
@@ -23,6 +32,7 @@ for key, value in logs.items():
     cells_available = slotframe_length * slotframe_width
     cells_used = value.get('nb_edges', "")
     occupancy_rate = cells_used / cells_available
+    key = key.replace(".json", "")
     header = "+-------------------------------+\n" + f"| Summary {key}            |\n" + "+-------------------------------+"
     data = header + \
         '\n- Solver results ' + \
@@ -44,3 +54,41 @@ for key, value in logs.items():
         '\n ' + \
         '\n'
     append_to_text(data, summary_file)
+
+    myTable.add_row([idx, key, int(value["nb_edges"]), int(value["nb_constraints"]), int(value.get("nb_slots", "")), int(value.get("nb_channels", "")), int(cells_available), int(cells_used), int(round(occupancy_rate, 2) * 100), round(float(value.get("processing_time", "")), 3), int(value.get("nb_solutions", ""))])
+    idx += 1 
+
+append_to_text(str(myTable), summary_file)
+write_to_text(str(myTable), table_file)
+print(myTable)
+
+
+# df = pd.DataFrame.from_records(myTable.rows, columns=myTable.field_names)
+# print(df)
+
+# df_edges = df['Occupancy rate'] 
+# fig = df_edges.plot(kind='bar', figsize=(5, 3), fontsize=14).get_figure()
+# fig.savefig('../out/Edges.png')
+# plt.show()
+
+# for col in df.columns:
+#     if col != "Topology":
+#         file_name = col.replace(" ", "_")
+#         print(col)
+#         fig = df[col].plot(kind='bar', figsize=(5, 3), fontsize=14).get_figure()
+#         fig.savefig(f'../out/plots/{file_name}.png')
+
+# fig1 = df['Edges'].plot(kind='bar', figsize=(5, 3), fontsize=14).get_figure()
+# fig1.savefig(f'../out/plots/edges.png')
+
+# fig2 = df['Constraints'].plot(kind='bar', figsize=(5, 3), fontsize=14).get_figure()
+# fig2.savefig(f'../out/plots/constraints.png')
+
+# fig3 = df['Cells available'].plot(kind='bar', figsize=(5, 3), fontsize=14).get_figure()
+# fig3.savefig(f'../out/plots/cells_available.png')
+
+# fig = df['Cells used'].plot(kind='bar', figsize=(5, 3), fontsize=14).get_figure()
+# fig.savefig(f'../out/plots/cells_used.png')
+
+# fig = df['Occupancy rate'].plot(kind='bar', figsize=(5, 3), fontsize=14).get_figure()
+# fig.savefig(f'../out/plots/occupancy_rate.png')

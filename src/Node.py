@@ -1,4 +1,4 @@
-from UWBCommunication import UWBCommunication
+from communication import UWBCommunication
 from abc import ABC, abstractmethod
 
 class Node(ABC):

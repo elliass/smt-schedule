@@ -1,6 +1,6 @@
 from z3 import Or, Sum, Optimize, sat
-from TSCHSchedule import TSCHSchedule
-from Slotframe import Slotframe
+from schedule import TSCHSchedule
+from slotframe import Slotframe
 import time
 
 class TSCHSolver:
@@ -44,13 +44,14 @@ class TSCHSolver:
         # Initialize TSCH schedule
         tsch_schedule = TSCHSchedule(self.network, max_slots, max_channels)
         timeslots, channels = tsch_schedule.get_timeslots_channels()
+        nodes = self.network.get_nodes()
         edges = self.network.get_edges()
         edges_str = self.network.get_edges_str()
         communications = self.network.get_communication()
         
         # Compute and return all model constraints
         constraints = tsch_schedule.compute()
-
+        
         # Create Z3 solver and add constraints
         solver = Optimize()
         # solver = Solver()
@@ -59,6 +60,7 @@ class TSCHSolver:
 
         # Set objective function to minimize timeslot
         solver.minimize(Sum(timeslots))
+        # solver.minimize(Sum(channels))
 
         # Evaluate model
         counter = 0
@@ -87,6 +89,7 @@ class TSCHSolver:
             counter += 1
         
         self.result_summary = {
+            'nb_nodes': len(nodes),
             'nb_edges': len(edges),
             'nb_communications': len(communications),
             'nb_solutions': len(self.solutions),
@@ -109,13 +112,15 @@ class TSCHSolver:
         found = False
         retries = 0
         while not found and retries < self.max_retries:
+            print(f"max_slots: {self.max_slots}, max_channels: {self.max_channels}, retries: {retries}")
             solutions, result_summary = self.find_feasible_schedules(self.max_slots, self.max_channels, retries)
             if len(solutions) > 0:
                 found = True
             else:
                 self.max_slots += 1 
-                self.max_channels += 1 
                 retries += 1
+                # if retries % 3 == 0:
+                self.max_channels += 1 
 
         # Capture the end time and compute the elapsed time
         end_time = time.time()
