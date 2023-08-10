@@ -40,6 +40,18 @@ class TSCHSchedule:
             self.get_timeslot_constraints(),
             self.get_channel_constraints(),
         ]
+        # print('##########################################################')
+        # print('\ndependency_constraints: \n')
+        # print(self.dependency_constraints)
+        # print('\nconflict_constraints: \n')
+        # print(self.conflict_constraints)
+        # print('\ndefault_constraints: \n')
+        # print(self.default_constraints)
+        # print('\ntimeslot_constraints: \n')
+        # print(self.timeslot_constraints)
+        # print('\nchannel_constraints: \n')
+        # print(self.channel_constraints)
+        # print('##########################################################')
         self.add_constraint(constraints)
         return self.get_constraint()
 
@@ -96,7 +108,21 @@ class TSCHSchedule:
                 node_t, node_v = communication_v
                 if (node_u == node_v or node_u == node_t or node_v == node_s) and edge_u != edge_v:
                     constraints = [ timeslots[self.to_int(edge_u.name)] != timeslots[self.to_int(edge_v.name)] ]
-                    self.conflict_constraints.extend(constraints)     
+                    self.conflict_constraints.extend(constraints)  
+
+        # for u in range(len(edges)):
+        #     edge_u = edges[u]
+        #     communication_u = communications[u]
+        #     node_u, node_s = communication_u
+        #     for v in range(u, len(edges)):
+        #         edge_v = edges[v]
+        #         communication_v = communications[v]
+        #         node_t, node_v = communication_v
+        #         if (node_u == node_v or node_u == node_t or node_v == node_s) and edge_u != edge_v:
+                    # # constraints = [ timeslots[self.to_int(edge_u.name)] != timeslots[self.to_int(edge_v.name)] ]
+                    # # self.conflict_constraints.extend(constraints)  
+                    # print([ timeslots[self.to_int(edge_u.name)] != timeslots[self.to_int(edge_v.name)] ])  
+
         return self.conflict_constraints
     
     def get_timeslot_constraints(self):
@@ -137,6 +163,23 @@ class TSCHSchedule:
                             Or(channels[self.to_int(edge_v.name)] != channels[self.to_int(edge_u.name)], channels[self.to_int(edge_v.name)] == channels[self.to_int(edge_u.name)])
                         )
                     ]) 
+
+        # for u in range(len(edges)):
+        #     edge_u = edges[u]
+        #     communication_u = communications[u]
+        #     node_u, node_s = communication_u
+        #     for v in range(u, len(edges)):
+        #         edge_v = edges[v]
+        #         communication_v = communications[v]
+        #         node_t, node_v = communication_v
+        #         if (node_u != node_v and node_u != node_t and node_v != node_s) and edge_u != edge_v: # and edge_u.is_forwarding():
+        #             restricted_channel_constraints.extend([ 
+        #                 If(
+        #                     timeslots[self.to_int(edge_v.name)] == timeslots[self.to_int(edge_u.name)], 
+        #                     channels[self.to_int(edge_v.name)] != channels[self.to_int(edge_u.name)],
+        #                     Or(channels[self.to_int(edge_v.name)] != channels[self.to_int(edge_u.name)], channels[self.to_int(edge_v.name)] == channels[self.to_int(edge_u.name)])
+        #                 )
+        #             ]) 
 
         # Concurrent edges are assigned different channel offsets (inequality added to constraints)
         constraints = restricted_channel_constraints

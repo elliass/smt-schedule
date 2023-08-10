@@ -1,2 +1,6 @@
 .venv
 *.pyc
+definition
+_*
+in
+out

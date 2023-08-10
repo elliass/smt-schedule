@@ -1,14 +1,28 @@
 from network import NetworkTopology
 from node import Tag, Anchor
 from solver import TSCHSolver
+# from Displayer import Displayer
 
-import argparse
+import json
 import random
 import time
 import os
 from z3 import IntVal
 
-from utils.files import read_from_json, write_to_json, write_to_text, get_topology_files
+FOLDER = "base_cell1"
+
+def get_topology_files(is_analysis=False):
+    topology_files = []
+    input_directory = f"../definition/base_cell1/input"
+    if is_analysis:
+        global FOLDER 
+        # FOLDER = "one_tag"
+        FOLDER = "binary_tree"
+        input_directory = f"../definition/{FOLDER}/input"
+    for file in sorted(os.listdir(input_directory)):
+        if file.endswith(".json"):
+            topology_files.append(os.path.join(input_directory, file))
+    return topology_files
 
 class Main:
     def __init__(self, max_solutions=1, max_slots=4, max_channels=1, max_retries=5):
@@ -18,9 +32,30 @@ class Main:
         self.max_retries = max_retries
         self.network = NetworkTopology()
         self.tsch_solver = TSCHSolver(self.network, max_solutions, self.max_slots, self.max_channels, self.max_retries)
+        # self.displayer = Displayer(self.network, self.tsch_solver)
+    
+
+    def read_from_json(self, input_file):
+        # Read JSON file with topology definition
+        with open(input_file, 'r') as file:
+            data = json.load(file)
+        return data
+    
+
+    def write_to_json(self, data, output_file):
+        # Write JSON results
+        with open(output_file, 'w') as file:
+            json.dump(data, file, indent=2, separators=(',',': '))
+
+    
+    def write_to_text(self, data, output_file):
+        # Write output to text file
+        with open(output_file, 'w') as file:
+            file.write(data)
+
 
     def setup_network_topology(self, input_file):
-        cells = read_from_json(input_file)
+        cells = self.read_from_json(input_file)
 
         for _, cell_value in cells.items():
             tags = cell_value.get("tags", [])
@@ -53,40 +88,45 @@ class Main:
                 for anchor_node in anchors_nodes:
                     self.network.add_edges(tag_node, anchor_node)
 
-            # Add forwarding communications
-            self.setup_forwarding_tree()
 
     def traverse_node_tree(self, node, root):
         if node.is_anchor() and node.name != root:
             self.network.add_edges(node, node.parent)
             self.traverse_node_tree(node.parent, root)
 
+
     def setup_forwarding_tree(self):
         root = "a1"
+        # Add forwarding communications
         for node in self.network.get_nodes():
             if node.is_anchor() and node.name != root:
                 self.traverse_node_tree(node, root)
 
+
     def run_tsch_algorithm(self):
         self.tsch_solver.run_solver()
 
+
     def select_random_slotframe(self):
+        # n = random.randint(0, len(solutions) - 1)
         solutions = self.tsch_solver.get_solutions()
-        n = random.randint(0, len(solutions) - 1)
+        n = 0
         return solutions[n]
+    
 
     def register_slotframe(self, slotframe):
-        for edge, timeslot, channel in zip(self.network.get_edges(), slotframe.get_timeslot(), slotframe.get_channel()):
+        for edge, timeslot, channel in zip(main.network.get_edges(), slotframe.get_timeslot(), slotframe.get_channel()):
             edge.set_cell(timeslot, channel)
 
-    def simulate_UWB_TSCH(self):
-        timeslot_duration = 0.5
-        results = self.tsch_solver.get_result_summary()
+
+    def simulate_UWB_TSCH(self, slotframe):
+        timeslot_duration = 1
+        results = main.tsch_solver.get_result_summary()
         slotframe_length = int(results['nb_slots']) + 1
-        asn = 0
-        while True:
+        valid = True
+        while valid:
             for timeslot in range(slotframe_length):
-                print(f"--- Timeslot {timeslot} (ASN {asn}) ---")
+                print(f"--- Timeslot {timeslot} ---")
                 for edge in self.network.get_edges():
                     node1, node2 = edge.get_node1(), edge.get_node2()
                     edge_timeslot, edge_channel = edge.get_cell()['timeslot'], edge.get_cell()['channel']
@@ -100,10 +140,22 @@ class Main:
                         transmission = node1.exchange(node2, payload)
                         print(f"{edge}: {transmission} on ts={edge_timeslot}, ch={edge_channel}")
                         # print(node2.get_queue())
-                    time.sleep(timeslot_duration)
-                asn += 1
+                        time.sleep(timeslot_duration)
+                    else:
+                        idx = int(edge.name[1:])
+                        slotframe.get_timeslot()[idx] = IntVal(timeslot)
+                        errors = slotframe.verify_slotframe(self.network.get_edges())
+                        # print(errors)
+                        # if len(errors) == 0:
+                        #     print(f"Alternative slot available on ts={edge_timeslot}, ch={edge_channel} for {edge}")
+                        # else:
+                        #     print('Conflict with at least one constraint')
+                            # print(edge.name, timeslot, True)
+                            # transmission = node1.exchange(node2, payload)
+                            # print(f"{edge}: {transmission} on ts={edge_timeslot}, ch={edge_channel}")
 
-    def output_communications(self, path):
+
+    def output_topology(self):
         edges = self.network.get_edges()
         header = "+-------------------------------+\n" + "| Network communications        |\n" + "+-------------------------------+"
         data = header
@@ -113,34 +165,38 @@ class Main:
             if communication.is_forwarding():
                 data = data + f"\nFOR {communication} | {communication.get_node1()} -> {communication.get_node2()}"
         # print(data)
-        write_to_text(data, f"{path}/communications.txt")
+        self.write_to_text(data, f"../definition/{FOLDER}/output/topology.txt")
 
-    def output_slotframe(self, slotframe, path):
+
+    def output_slotframe(self, slotframe):
         table = slotframe.show_as_table(self.network.get_edges(), self.network.get_communication())
         header = "+-------------------------------+\n" + "| Slotframe                     |\n" + "+-------------------------------+"
         data = header + "\n" + str(table)
         # print(data)
-        write_to_text(data,  f"{path}/slotframe.txt")
+        self.write_to_text(data,  f"../definition/{FOLDER}/output/slotframe.txt")
 
-    def output_logs(self, topology, path, logs={}):
-        results = self.tsch_solver.get_result_summary()
-        solutions = results["solutions"]
-        logs[topology] = results
-        write_to_json(logs, f"{path}/logs.json")
-        write_to_json(solutions, f"{path}/solutions.json")
+
+    def set_logs(self, topology, result_summary):
+        logs[topology] = result_summary
+    
+
+    def get_logs(self):
+        return logs
+    
+
+    def output_logs(self, file):
+        results = main.tsch_solver.get_result_summary()
+        self.set_logs(file, results)
+        data = self.get_logs()
+        # self.write_to_text(str(data), '../out/logs.txt')
+        self.write_to_json(data, f"../definition/{FOLDER}/output/logs.json")
 
 
 if __name__ == "__main__":
-    # Handle arguments
-    parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--watch", action='store_true', help="run UWB-TSCH network simulation")
-    args = parser.parse_args()
-
-    # Get topology file
-    FOLDER = "topology"
-    input_path = os.path.join("../in/", FOLDER)
-    output_path = os.path.join("../out/", FOLDER)
-    topology_files = get_topology_files(input_path)
+    # Get topology file (or files for sensitivity analysis)
+    is_analysis = False
+    topology_files = get_topology_files(is_analysis)
+    logs = {}
 
     # Trigger algorithm execution
     for topology_file in topology_files:
@@ -151,27 +207,25 @@ if __name__ == "__main__":
 
         # Setup network topology and forwarding tree
         main.setup_network_topology(topology_file)
+        main.setup_forwarding_tree()
 
         # Trigger TSCH algorithm and show solutions
         main.run_tsch_algorithm()
 
         # Export logs
         file = os.path.basename(topology_file)
-        main.output_logs(file, output_path)
+        main.output_logs(file)
 
+        # if not is_analysis:
         # Select slotframe
         slotframe = main.select_random_slotframe()
 
         # Export topology and slotframe
-        main.output_communications(output_path)
-        main.output_slotframe(slotframe, output_path)
+        main.output_topology()
+        main.output_slotframe(slotframe)
 
-        # Control network over selected slotframe
-        if args.watch:
-            print(f"*** Start network simulation")
-            try:
-                while True:
-                    main.register_slotframe(slotframe)
-                    main.simulate_UWB_TSCH()
-            except KeyboardInterrupt:
-                print("\n*** End of simulation")
+            # # Control network over selected slotframe
+            # main.register_slotframe(slotframe)
+            # main.simulate_UWB_TSCH(slotframe)
+            
+print("folder:", FOLDER)

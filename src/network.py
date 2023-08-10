@@ -1,5 +1,5 @@
-from UWBCommunication import UWBCommunication, CAP, Ranging, Forwarding
-from Node import Node
+from communication import UWBCommunication, Ranging, Forwarding
+from node import Node
 
 class NetworkTopology:
     def __init__(self):
