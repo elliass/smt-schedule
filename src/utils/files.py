@@ -17,6 +17,11 @@ def write_to_text(data, output_file):
     with open(output_file, 'w') as file:
         file.write(data)
 
+def append_to_text(data, output_file):
+    # Append output to text file
+    with open(output_file, 'a') as file:
+        file.write(data)
+
 def get_topology_files(path):
     topology_files = []
     for file in sorted(os.listdir(path)):

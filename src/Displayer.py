@@ -5,8 +5,7 @@ class Displayer:
     def __init__(self, network:NetworkTopology, tsch_solver:TSCHSolver):
         self.network = network
         self.tsch_solver = tsch_solver
-    
-    
+
     def verify_all_solutions(self):
         solutions = self.tsch_solver.get_solutions()
         edges = self.network.get_edges()
@@ -16,7 +15,6 @@ class Displayer:
                 return False
         return True
     
-
     def display_all_solutions(self):
         print("+-------------------------------+")
         print("| All solutions                 |")
@@ -30,7 +28,6 @@ class Displayer:
                 print("Solution is not verified")
                 break
             solution.display_solution(edges)
-
 
     def display_network(self):
         print("+-------------------------------+")
@@ -49,7 +46,6 @@ class Displayer:
                 print(f"RAN {communication} | {communication.get_node1()} <-> {communication.get_node2()}")
             if communication.is_forwarding():
                 print(f"FOR {communication} | {communication.get_node1()} -> {communication.get_node2()}")
-
 
     def analyze_logs(self, logs):
         for key, log in logs.items():
@@ -75,7 +71,6 @@ class Displayer:
             print(f"  * Number of cells available: {cells_available}")
             print(f"  * Number of cells used: {cells_used}")
             print(f"  * Slotframe occupancy rate: {round(occupancy_rate, 2) * 100} %")
-
 
     def get_analysis(self, logs):
         for key, value in logs.items():
