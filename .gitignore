@@ -1,6 +1,6 @@
 .venv
 *.pyc
 definition
-_*
+__pycache__
 in
 out
