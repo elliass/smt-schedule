@@ -132,17 +132,25 @@ class Main:
 if __name__ == "__main__":
     # Handle arguments
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--watch", action='store_true', help="run UWB-TSCH network simulation")
+    parser.add_argument("--topology", type=str, default="default", help="run scheduling alogrithm for specified topology")
+    parser.add_argument("--watch", action='store_true', help="run with UWB-TSCH network simulation")
     args = parser.parse_args()
 
     # Get topology file
-    FOLDER = "topology"
-    input_path = os.path.join("../in/", FOLDER)
-    output_path = os.path.join("../out/", FOLDER)
-    topology_files = get_topology_files(input_path)
-
+    if args.topology:
+        try:
+            FOLDER = args.topology
+            input_path = os.path.join("../in/", FOLDER)
+            output_path = os.path.join("../out/", FOLDER)
+            topology_files = get_topology_files(input_path)
+        except FileNotFoundError:
+            print("File provided was not found.")
+            raise SystemExit("Please enter a valid topology...")
+    
     # Trigger algorithm execution
     for topology_file in topology_files:
+        print(f"Running scheduling algorithm for topology: {topology_file}")
+
         # Initialize network and solver parameters
         main = Main(max_solutions=1, max_slots=4, max_channels=1, max_retries=20)
         network = main.network
@@ -155,6 +163,8 @@ if __name__ == "__main__":
         main.run_tsch_algorithm()
 
         # Export logs
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
         file = os.path.basename(topology_file)
         main.output_logs(file, output_path)
 
@@ -167,7 +177,7 @@ if __name__ == "__main__":
 
         # Control network over selected slotframe
         if args.watch:
-            print(f"*** Start network simulation")
+            print(f"*** Starting network simulation")
             try:
                 while True:
                     main.register_slotframe(slotframe)
