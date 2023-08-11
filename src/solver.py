@@ -1,6 +1,6 @@
 from z3 import Or, Sum, Optimize, sat
 from schedule import TSCHSchedule
-from slotframe_fix import Slotframe
+from slotframe import Slotframe
 import time
 
 class TSCHSolver:

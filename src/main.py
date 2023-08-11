@@ -1,12 +1,11 @@
 from network import NetworkTopology
-from node_fix import Tag, Anchor
+from node import Tag, Anchor
 from solver import TSCHSolver
 
 import argparse
 import random
 import time
 import os
-from z3 import IntVal
 
 from utils.files import read_from_json, write_to_json, write_to_text, get_topology_files
 

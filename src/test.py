@@ -1,6 +1,6 @@
 from network import NetworkTopology
-from node_fix import Tag, Anchor
-from slotframe_fix import Slotframe
+from node import Tag, Anchor
+from slotframe import Slotframe
 
 import argparse
 import json
