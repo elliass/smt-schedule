@@ -1,5 +1,5 @@
 from network import NetworkTopology
-from node import Tag, Anchor
+from node_fix import Tag, Anchor
 from solver import TSCHSolver
 # from Displayer import Displayer
 

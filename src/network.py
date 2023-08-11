@@ -1,5 +1,5 @@
 from communication import UWBCommunication, Ranging, Forwarding
-from node import Node
+from node_fix import Node
 
 class NetworkTopology:
     def __init__(self):
