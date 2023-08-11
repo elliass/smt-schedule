@@ -68,9 +68,10 @@ Add here...
 <!-- ARCHITECTURE -->
 ## Architecture
 
+Add here...
+
 ![Project Architecture][project-architecture]
 
-Add here...
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -1,0 +1,60 @@
+{
+  "cell1_t1.json": {
+    "nb_nodes": 4,
+    "nb_edges": 5,
+    "nb_communications": 5,
+    "nb_solutions": 1,
+    "nb_constraints": 45,
+    "nb_slots": 4,
+    "nb_channels": 1,
+    "nb_retries": 0,
+    "edges": [
+      "e0",
+      "e1",
+      "e2",
+      "e3",
+      "e4"
+    ],
+    "communications": [
+      [
+        "t1",
+        "a1"
+      ],
+      [
+        "t1",
+        "a2"
+      ],
+      [
+        "t1",
+        "a3"
+      ],
+      [
+        "a2",
+        "a1"
+      ],
+      [
+        "a3",
+        "a1"
+      ]
+    ],
+    "solutions": [
+      {
+        "timeslot": [
+          3,
+          1,
+          2,
+          2,
+          4
+        ],
+        "channel": [
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "processing_time": 0.06272697448730469
+  }
+}
