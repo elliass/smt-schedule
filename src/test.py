@@ -1,11 +1,11 @@
-from network import NetworkTopology
-from node import Tag, Anchor
-from slotframe import Slotframe
-
 import argparse
 import json
 import os
 from z3 import IntVal
+
+from scheduling.network import NetworkTopology
+from scheduling.node import Tag, Anchor
+from scheduling.slotframe import Slotframe
 
 from utils.files import read_from_json, get_topology_files
 

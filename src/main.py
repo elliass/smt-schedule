@@ -1,11 +1,11 @@
-from network import NetworkTopology
-from node import Tag, Anchor
-from solver import TSCHSolver
-
 import argparse
 import random
 import time
 import os
+
+from scheduling.network import NetworkTopology
+from scheduling.node import Tag, Anchor
+from scheduling.solver import TSCHSolver
 
 from utils.files import read_from_json, write_to_json, write_to_text, get_topology_files
 

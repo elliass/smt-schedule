@@ -1,5 +1,5 @@
-from network import NetworkTopology
-from solver import TSCHSolver
+from scheduling.network import NetworkTopology
+from scheduling.solver import TSCHSolver
 
 class Displayer:
     def __init__(self, network:NetworkTopology, tsch_solver:TSCHSolver):
