@@ -1,0 +1,25 @@
++-------------------------------+
+| Summary cell1_t1            |
++-------------------------------+
+- Solver results 
+  - Processing_time: 0.06272697448730469
+  - Number of edges: 5
+  - Number of communications: 5
+  - Number of solutions: 1
+  - Number of constraints: 45
+  - Number of slots: 4
+  - Number of channels: 1
+  - Number of retries: 0
+  - Edges: ['e0', 'e1', 'e2', 'e3', 'e4']
+  - Communications: [['t1', 'a1'], ['t1', 'a2'], ['t1', 'a3'], ['a2', 'a1'], ['a3', 'a1']]
+
+- Slotframe quality 
+  - Number of cells available: 8
+  - Number of cells used: 5
+  - Slotframe occupancy rate: 62.0%
+ 
++----+----------+-------+-------------+-----------+----------+-----------------+------------+----------------+-----------------+-------+
+| Id | Topology | Edges | Constraints | Timeslots | Channels | Cells available | Cells used | Occupancy rate | Processing time | Found |
++----+----------+-------+-------------+-----------+----------+-----------------+------------+----------------+-----------------+-------+
+| 0  | cell1_t1 |   5   |      45     |     4     |    1     |        8        |     5      |       62       |      0.063      |   1   |
++----+----------+-------+-------------+-----------+----------+-----------------+------------+----------------+-----------------+-------+
