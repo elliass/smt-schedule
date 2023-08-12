@@ -67,14 +67,15 @@ class Main:
             slotframe = self.convert_schedule(solution)
             result = self.test_solution(slotframe)
             if result == "Test failed":
-                # print(result)
                 return result
         return "All tests passed" 
 
     def test_solution(self, solution):
         errors = solution.verify_slotframe(network.get_edges())
         if errors:
-            print(f"Schedule broke at least one constraint. \nThe following errors were detected: \n{errors}")
+            print(f"Schedule broke at least one constraint. \nThe following errors were detected:")
+            for error in errors:
+                print(f"-- {type(error).__name__}: {error}")
             return "Test failed"
         return "Test passed"
 
