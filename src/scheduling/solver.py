@@ -1,9 +1,9 @@
 from z3 import Or, Sum, Optimize, sat
-from scheduling.schedule import TSCHSchedule
+from scheduling.schedule import Schedule
 from scheduling.slotframe import Slotframe
 import time
 
-class TSCHSolver:
+class UWBTSCHSolver:
     def __init__(self, network, max_solutions, max_slots, max_channels, max_retries):
         self.network = network
         self.max_solutions = max_solutions
@@ -42,7 +42,7 @@ class TSCHSolver:
 
     def find_feasible_schedules(self, max_slots, max_channels, retries):
         # Initialize TSCH schedule
-        tsch_schedule = TSCHSchedule(self.network, max_slots, max_channels)
+        tsch_schedule = Schedule(self.network, max_slots, max_channels)
         timeslots, channels = tsch_schedule.get_timeslots_channels()
         nodes = self.network.get_nodes()
         edges = self.network.get_edges()

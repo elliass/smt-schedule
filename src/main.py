@@ -5,7 +5,7 @@ import os
 
 from scheduling.network import NetworkTopology
 from scheduling.node import Tag, Anchor
-from scheduling.solver import TSCHSolver
+from scheduling.solver import UWBTSCHSolver
 
 from utils.files import read_from_json, write_to_json, write_to_text, get_topology_files
 
@@ -16,7 +16,7 @@ class Main:
         self.max_channels = max_channels
         self.max_retries = max_retries
         self.network = NetworkTopology()
-        self.tsch_solver = TSCHSolver(self.network, max_solutions, self.max_slots, self.max_channels, self.max_retries)
+        self.tsch_solver = UWBTSCHSolver(self.network, max_solutions, self.max_slots, self.max_channels, self.max_retries)
 
     def setup_network_topology(self, input_file):
         cells = read_from_json(input_file)

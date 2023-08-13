@@ -67,14 +67,14 @@ class Slotframe:
         return data
 
     def verify_slotframe(self, edges):
-        timeslots = self.get_timeslot()
+        timeslots, channels = self.get_timeslot(), self.get_channel()
         errors = []
-        for tsi, edgei in zip(timeslots, edges):
+        for tsi, chi, edgei in zip(timeslots, channels, edges):
             # Check shared constraints
             if not edgei.is_cap() and tsi == 0:
                 error_message = f"Shared error raised with timselot['{edgei}'] = {tsi}"
                 errors.append(SharedException(edgei, error_message))
-            for tsj, edgej in zip(timeslots, edges):
+            for tsj, chj, edgej in zip(timeslots, channels, edges):
                 nodei1, nodei2 = edgei.get_node1(), edgei.get_node2()
                 nodej1, nodej2 = edgej.get_node1(), edgej.get_node2()
                 # Check dependency constraints
@@ -84,9 +84,42 @@ class Slotframe:
                         errors.append(DependencyException(edgei, edgej, error_message))
                 # Check concurrency constraints
                 if edgei != edgej and int(tsi.as_long()) == int(tsj.as_long()):
-                    if edgei != edgej and int(tsi.as_long()) == int(tsj.as_long()):
-                        nodes = {nodei1, nodei2, nodej1, nodej2}
-                        if len(nodes) < 4: 
-                            error_message = f"Concurrency error raised with timselot['{edgei}'] = timselot['{edgej}']"
-                            errors.append(ConcurrencyException(edgei, edgej, error_message))
+                    nodes = {nodei1, nodei2, nodej1, nodej2}
+                    if len(nodes) < 4: 
+                        error_message = f"Concurrency error raised with timselot['{edgei}'] = timselot['{edgej}']"
+                        errors.append(ConcurrencyException(edgei, edgej, error_message))
+                    if int(chi.as_long()) == int(chj.as_long()):
+                        print(nodei1, nodei2, nodej1, nodej2)
+                        error_message = f"Concurrency error raised with channel['{edgei}'] = channel['{edgej}']"
+                        errors.append(ConcurrencyException(edgei, edgej, error_message))
         return errors
+    
+    # def verify_slotframe(self, edges):
+    #     timeslots, channels = self.get_timeslot(), self.get_channel()
+    #     errors = []
+    #     for i in range(len(edges)):
+    #         edgei, tsi, chi = edges[i], timeslots[i], channels[i]
+    #         # Check shared constraints
+    #         if not edgei.is_cap() and tsi == 0:
+    #             error_message = f"Shared error raised with timselot['{edgei}'] = {tsi}"
+    #             errors.append(SharedException(edgei, error_message))
+    #         for j in range(i, len(edges)):
+    #             edgej, tsj, chj = edges[j], timeslots[j], channels[j]
+    #             nodei1, nodei2 = edgei.get_node1(), edgei.get_node2()
+    #             nodej1, nodej2 = edgej.get_node1(), edgej.get_node2()
+    #             # Check dependency constraints
+    #             if nodei1.is_tag() and nodej1.is_anchor() and nodei2 == nodej1:
+    #                 if int(tsi.as_long()) >= int(tsj.as_long()):
+    #                     error_message = f"Dependency error raised with timselot['{edgei}'] >= timselot['{edgej}']"
+    #                     errors.append(DependencyException(edgei, edgej, error_message))
+    #             # Check concurrency constraints
+    #             if edgei != edgej and int(tsi.as_long()) == int(tsj.as_long()):
+    #                 nodes = {nodei1, nodei2, nodej1, nodej2}
+    #                 if len(nodes) < 4: 
+    #                     error_message = f"Concurrency error raised with timselot['{edgei}'] = timselot['{edgej}']"
+    #                     errors.append(ConcurrencyException(edgei, edgej, error_message))
+    #                 if int(chi.as_long()) == int(chj.as_long()):
+    #                     print(nodei1, nodei2, nodej1, nodej2)
+    #                     error_message = f"Concurrency error raised with channel['{edgei}'] = channel['{edgej}']"
+    #                     errors.append(ConcurrencyException(edgei, edgej, error_message))
+    #     return errors

@@ -1,6 +1,6 @@
 from z3 import Int, And, Or, If
 
-class TSCHSchedule:
+class Schedule:
     def __init__(self, network, max_slots, max_channels):
         self.network = network
         self.max_slots = max_slots
