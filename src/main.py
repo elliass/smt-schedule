@@ -170,6 +170,7 @@ if __name__ == "__main__":
 
         # Select slotframe
         slotframe = main.select_random_slotframe()
+        print(f"""Random solution found: {{"timeslot": {slotframe.get_timeslot_to_string()}, "channel": {slotframe.get_channel_to_string()}}}""")
 
         # Export topology and slotframe
         main.output_communications(output_path)

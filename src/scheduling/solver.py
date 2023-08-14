@@ -105,6 +105,7 @@ class UWBTSCHSolver:
     
 
     def run_solver(self):
+        print(f"*** Starting solver")
         # Capture the start time
         start_time = time.time()
 
@@ -112,7 +113,7 @@ class UWBTSCHSolver:
         found = False
         retries = 0
         while not found and retries < self.max_retries:
-            print(f"max_slots: {self.max_slots}, max_channels: {self.max_channels}, retries: {retries}")
+            print(f"Running solver with following configuration: max_slots={self.max_slots}, max_channels={self.max_channels}, retries={retries}")
             solutions, result_summary = self.find_feasible_schedules(self.max_slots, self.max_channels, retries)
             if len(solutions) > 0:
                 found = True
@@ -127,4 +128,5 @@ class UWBTSCHSolver:
         self.result_summary['processing_time'] = end_time - start_time
         if not found:
             self.result_summary['retries'] = "Number of maximum retries reached"
+        print(f"*** End of solver")
     

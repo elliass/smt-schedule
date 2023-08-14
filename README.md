@@ -52,7 +52,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Add here...
+This project aims to address the challenges of scheduling Ultra Wideband Time-Slotted Channel Hopping (UWB-TSCH) communications using a novel approach that leverages Satisfiability Modulo Theories (SMT) solvers. UWB-TSCH networks offer high data rates as well as high-precision ranging capabilities extremely useful in positioning applications. However, providing an efficient scheduling for such network is crucial in order to maximize their potential.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
