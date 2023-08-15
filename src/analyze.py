@@ -87,3 +87,4 @@ for key, value in logs.items():
 # Write output
 append_to_text(str(myTable), summary_file)
 write_to_text(str(myTable), table_file)
+print(myTable)

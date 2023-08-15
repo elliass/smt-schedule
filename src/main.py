@@ -132,7 +132,11 @@ class Main:
 if __name__ == "__main__":
     # Handle arguments
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--topology", type=str, default="default", help="run scheduling alogrithm for specified topology")
+    parser.add_argument("--topology", type=str, default="default", help="run scheduling algorithm for specified topology")
+    parser.add_argument("--max_solutions", type=int, default=1, help="")
+    parser.add_argument("--max_slots", type=int, default=4, help="")
+    parser.add_argument("--max_channels", type=int, default=1, help="")
+    parser.add_argument("--max_retries", type=int, default=10, help="")
     parser.add_argument("--watch", action='store_true', help="run with UWB-TSCH network simulation")
     args = parser.parse_args()
 
@@ -150,9 +154,10 @@ if __name__ == "__main__":
     # Trigger algorithm execution
     for topology_file in topology_files:
         print(f"Running scheduling algorithm for topology: {topology_file}")
+        print(f"Initial configuration: max_solutions={args.max_solutions}, max_slots={args.max_slots}, max_channels={args.max_channels}, max_retries={args.max_retries}")
 
         # Initialize network and solver parameters
-        main = Main(max_solutions=1, max_slots=4, max_channels=1, max_retries=20)
+        main = Main(max_solutions=args.max_solutions, max_slots=args.max_slots, max_channels=args.max_channels, max_retries=args.max_retries)
         network = main.network
         tsch_solver = main.tsch_solver
 
