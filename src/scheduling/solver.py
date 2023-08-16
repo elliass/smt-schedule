@@ -60,7 +60,6 @@ class UWBTSCHSolver:
 
         # Set objective function to minimize timeslot
         solver.minimize(Sum(timeslots))
-        # solver.minimize(Sum(channels))
 
         # Evaluate model
         counter = 0
@@ -120,7 +119,6 @@ class UWBTSCHSolver:
             else:
                 self.max_slots += 1 
                 retries += 1
-                # if retries % 3 == 0:
                 self.max_channels += 1 
 
         # Capture the end time and compute the elapsed time

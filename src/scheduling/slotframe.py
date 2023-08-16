@@ -94,6 +94,7 @@ class Slotframe:
                         errors.append(ConcurrencyException(edgei, edgej, error_message))
         return errors
     
+    # Remove duplicated exceptions
     # def verify_slotframe(self, edges):
     #     timeslots, channels = self.get_timeslot(), self.get_channel()
     #     errors = []

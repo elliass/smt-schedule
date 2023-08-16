@@ -40,18 +40,6 @@ class Schedule:
             self.get_timeslot_constraints(),
             self.get_channel_constraints(),
         ]
-        # print('##########################################################')
-        # print('\ndependency_constraints: \n')
-        # print(self.dependency_constraints)
-        # print('\nconflict_constraints: \n')
-        # print(self.conflict_constraints)
-        # print('\ndefault_constraints: \n')
-        # print(self.default_constraints)
-        # print('\ntimeslot_constraints: \n')
-        # print(self.timeslot_constraints)
-        # print('\nchannel_constraints: \n')
-        # print(self.channel_constraints)
-        # print('##########################################################')
         self.add_constraint(constraints)
         return self.get_constraint()
 
@@ -63,15 +51,11 @@ class Schedule:
         time_domain_constraint = [ And(0 <= timeslots[i], timeslots[i] <= self.max_slots) for i in range(len(edges)) ]
         frequency_domain_constraint = [ And(0 <= channels[i], channels[i] <= self.max_channels) for i in range(len(edges)) ]
 
-        # # Cell (0,0) is reserved for CAP and always equal to 0 REMOVED CAP
-        # cap_constraint = [ And(timeslots[0] == 0, channels[0] == 0) ]
-
         # Timeslot 0 is reserved for shared communications
-        # shared_constraint = [ timeslots[i] != 0 for i in range(len(edges)) if i != 0 ] REMOVED CAP
         shared_constraint = [ timeslots[i] != 0 for i in range(len(edges)) ]
 
         # Add default constraints to the model
-        constraint = time_domain_constraint + frequency_domain_constraint + shared_constraint # + cap_constraint REMOVED CAP
+        constraint = time_domain_constraint + frequency_domain_constraint + shared_constraint
         self.default_constraints.extend(constraint)
         return self.default_constraints
     
@@ -110,6 +94,7 @@ class Schedule:
                     constraints = [ timeslots[self.to_int(edge_u.name)] != timeslots[self.to_int(edge_v.name)] ]
                     self.conflict_constraints.extend(constraints)  
 
+        # Remove duplicated constraints
         # for u in range(len(edges)):
         #     edge_u = edges[u]
         #     communication_u = communications[u]
@@ -164,6 +149,7 @@ class Schedule:
                         )
                     ]) 
 
+        # Remove duplicated constraints
         # for u in range(len(edges)):
         #     edge_u = edges[u]
         #     communication_u = communications[u]
