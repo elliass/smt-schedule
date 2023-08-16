@@ -1,5 +1,5 @@
-from scheduling.communication import UWBCommunication, Ranging, Forwarding
-from scheduling.node import Node
+from .communication import UWBCommunication, Ranging, Forwarding
+from .node import Node
 
 class NetworkTopology:
     def __init__(self):

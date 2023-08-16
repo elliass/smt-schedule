@@ -1,6 +1,6 @@
 from z3 import Or, Sum, Optimize, sat
-from scheduling.schedule import Schedule
-from scheduling.slotframe import Slotframe
+from .schedule import Schedule
+from .slotframe import Slotframe
 import time
 
 class UWBTSCHSolver:

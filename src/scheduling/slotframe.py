@@ -1,5 +1,5 @@
 from prettytable import PrettyTable, ALL
-from scheduling.exception import SharedException, DependencyException, ConcurrencyException
+from .exception import SharedException, DependencyException, ConcurrencyException
 
 class Slotframe:
     def __init__(self):
